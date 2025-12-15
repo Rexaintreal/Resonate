@@ -1,0 +1,44 @@
+Resonate - Resonate is a web app which uses your laptop mic and FTT to visualize sound frequencies in realtime
+
+Tech Stack - HTML, Tailwind CSS, JS and Flask
+APIs - DSP.js for FFT and signal processing Tone.js for Audio library easier sound handling and Pitchy for Pitch detection
+
+
+Project Structure 
+
+resonate/
+├── assets/
+│   └── design.txt
+├── static/
+│   ├── css/
+│   │   ├── input.css
+│   │   └── style.css
+│   └── js/
+│       ├── audio.js
+│       ├── fft_processor.js
+│       ├── main.js
+│       └── tuner_ui.js
+├── templates/
+│   ├── auth.html
+│   ├── home.html
+│   ├── index.html
+│   └── tuner.html
+├── .gitignore
+├── app.py
+├── LICENSE
+├── README.md
+└── requirements.txt
+
+Color Pallete
+Primary Background - Black (#000000)	The deep, high-contrast base for the application.
+Primary Text - White (#FFFFFF)	Used for all main headings and titles (like "Resonate").
+Secondary Text - Gray (#888888)	Used for subtext, descriptions, and placeholder text (Matches your reference exactly).
+Accent Color - Vibrant Teal/Aqua (#00FFFF)	Used to highlight interactive elements (buttons, links) and, most importantly, the real-time FFT visualizations. This contrast will make the dancing frequency bars "pop" beautifully on the black background.
+Button Background (Default) - Dark Gray (#1A1A1A)	A subtle, slightly softer background for buttons (like the "Build plugins" button in your reference).
+Button Text (Primary) - White (#FFFFFF)	Text inside the primary action buttons.
+
+Fonts
+Headings/Titles - Montserrat
+Body/UI - interactive
+
+Logo - assets/logo.png
