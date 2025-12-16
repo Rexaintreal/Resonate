@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Resonate</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes overlayFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-overlay {
+            animation: overlayFadeIn 0.2s ease-out;
+        }
+
+        .modal-content {
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid #000;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spinner 0.6s linear infinite;
+        }
+
+        @keyframes spinner {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <script>
+        window.FIREBASE_CONFIG = {
+            FIREBASE_API_KEY: "{{ config.FIREBASE_API_KEY }}",
+            FIREBASE_AUTH_DOMAIN: "{{ config.FIREBASE_AUTH_DOMAIN }}",
+            FIREBASE_PROJECT_ID: "{{ config.FIREBASE_PROJECT_ID }}",
+            FIREBASE_STORAGE_BUCKET: "{{ config.FIREBASE_STORAGE_BUCKET }}",
+            FIREBASE_MESSAGING_SENDER_ID: "{{ config.FIREBASE_MESSAGING_SENDER_ID }}",
+            FIREBASE_APP_ID: "{{ config.FIREBASE_APP_ID }}"
+        };
+    </script>
+</head>
+<body>
+    <div id="errorModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-overlay" style="background-color: rgba(0, 0, 0, 0.8);">
+        <div class="bg-[#0A0A0A] border-2 border-[#666] rounded-2xl p-8 max-w-md w-full shadow-2xl modal-content">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 bg-[#666] bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-2xl text-[#888]"></i>
+                </div>
+                <h3 class="font-['Montserrat'] font-bold text-2xl text-white">Authentication Error</h3>
+            </div>
+            <p id="errorMessage" class="text-[#CCCCCC] mb-6 leading-relaxed font-['Inter']"></p>
+            <button id="closeErrorModal" class="w-full bg-[#666] hover:bg-[#777] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter']">
+                Close
+            </button>
+        </div>
+    </div>
+    <div id="successModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-overlay" style="background-color: rgba(0, 0, 0, 0.8);">
+        <div class="bg-[#0A0A0A] border-2 border-white rounded-2xl p-8 max-w-md w-full shadow-2xl modal-content">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-check-circle text-2xl text-white"></i>
+                </div>
+                <h3 class="font-['Montserrat'] font-bold text-2xl text-white">Success!</h3>
+            </div>
+            <p class="text-[#CCCCCC] mb-6 leading-relaxed font-['Inter']">
+                Signed in successfully. Redirecting...
+            </p>
+            <div class="flex items-center justify-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+            </div>
+        </div>
+    </div>
+    <a href="https://hackclub.com/" target="_blank" class="block z-[60]">
+        <img src="{{ url_for('static', filename='assets/hackclubflagfromleft.png') }}" alt="Hack Club Flag" class="hackclub-banner">
+    </a>
+    <nav class="relative z-50 w-full pt-6 pb-4 px-6 md:px-12 pointer-events-auto">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/" class="flex items-center gap-3 ml-24 md:ml-32">
+                <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Resonate" class="h-10 w-10 object-contain">
+                <span class="font-['Montserrat'] font-bold text-2xl tracking-tight text-white">Resonate</span>
+            </a>
+            <div class="flex items-center gap-6">
+                <a href="https://hackclub.com/" target="_blank" class="hover:opacity-80 transition-opacity p-1">
+                    <img src="{{ url_for('static', filename='assets/hackclub.png') }}" alt="Hack Club" class="h-6 w-6 object-contain">
+                </a>
+                <a href="https://github.com/Rexaintreal/Resonate" target="_blank" class="text-[#888888] hover:text-white transition-colors p-1">
+                    <i class="fab fa-github text-2xl"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+    <main class="flex-1 flex flex-col items-center justify-center px-6 relative z-0">
+        <div class="text-center w-full max-w-md mx-auto">
+            <div class="mb-8">
+                <h1 class="font-['Montserrat'] font-bold text-4xl md:text-5xl text-white mb-3">Welcome Back</h1>
+                <p class="text-lg text-[#888888] font-['Inter']">Sign in to visualize sound frequencies</p>
+            </div>
+            <div class="bg-[#0A0A0A] border border-[#1A1A1A] rounded-2xl p-8 shadow-2xl">
+                <button id="googleSignIn" class="w-full bg-white hover:bg-gray-100 text-black font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-['Inter']">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19.6 10.227c0-.709-.064-1.39-.182-2.045H10v3.868h5.382a4.6 4.6 0 01-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.35z" fill="#4285F4"/>
+                        <path d="M10 20c2.7 0 4.964-.895 6.618-2.423l-3.232-2.509c-.895.6-2.04.955-3.386.955-2.605 0-4.81-1.76-5.595-4.123H1.064v2.59A9.996 9.996 0 0010 20z" fill="#34A853"/>
+                        <path d="M4.405 11.9c-.2-.6-.314-1.24-.314-1.9 0-.66.114-1.3.314-1.9V5.51H1.064A9.996 9.996 0 000 10c0 1.614.386 3.14 1.064 4.49l3.34-2.59z" fill="#FBBC05"/>
+                        <path d="M10 3.977c1.468 0 2.786.505 3.823 1.496l2.868-2.868C14.959.99 12.695 0 10 0 6.09 0 2.71 2.24 1.064 5.51l3.34 2.59C5.19 5.736 7.395 3.977 10 3.977z" fill="#EA4335"/>
+                    </svg>
+                    <span>Continue with Google</span>
+                </button>
+                <div class="mt-6 pt-6 border-t border-[#1A1A1A]">
+                    <p class="text-sm text-[#888888] font-['Inter']">
+                        By signing in, you agree to our Terms of Service and Privacy Policy
+                    </p>
+                </div>
+            </div>
+            <div class="mt-8">
+                <a href="/" class="text-white hover:text-[#CCCCCC] transition-colors font-medium font-['Inter']">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+    </main>
+    <footer class="py-8 relative z-10 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 flex justify-center text-sm text-[#CCCCCC]">
+            <p class="flex items-center gap-2 font-['Inter']">
+                Made for 
+                <a href="https://axiom.hackclub.com/" target="_blank" class="hover:opacity-80 transition-opacity">
+                    <img src="{{ url_for('static', filename='assets/axiom.png') }}" alt="Axiom" class="h-5">
+                </a> 
+                by 
+                <a href="https://saurabhcodesawfully.pythonanywhere.com/" target="_blank" class="text-white font-medium hover:text-[#CCCCCC] transition-colors">
+                    Saurabh Tiwari
+                </a>
+            </p>
+        </div>
+    </footer>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

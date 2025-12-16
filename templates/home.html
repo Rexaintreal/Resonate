@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Resonate</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logout-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #1A1A1A;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888888;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #333;
+        }
+
+        .logout-icon:hover {
+            background: #262626;
+            color: #FFFFFF;
+            border-color: #555;
+            transform: scale(1.05);
+        }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: overlayFadeIn 0.2s ease-out;
+        }
+
+        .modal-content {
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes overlayFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+    <script>
+        window.FIREBASE_CONFIG = {
+            FIREBASE_API_KEY: "{{ config.FIREBASE_API_KEY }}",
+            FIREBASE_AUTH_DOMAIN: "{{ config.FIREBASE_AUTH_DOMAIN }}",
+            FIREBASE_PROJECT_ID: "{{ config.FIREBASE_PROJECT_ID }}",
+            FIREBASE_STORAGE_BUCKET: "{{ config.FIREBASE_STORAGE_BUCKET }}",
+            FIREBASE_MESSAGING_SENDER_ID: "{{ config.FIREBASE_MESSAGING_SENDER_ID }}",
+            FIREBASE_APP_ID: "{{ config.FIREBASE_APP_ID }}"
+        };
+    </script>
+</head>
+<body>
+    <div id="logoutModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-overlay">
+        <div class="bg-[#0A0A0A] border-2 border-[#333] rounded-2xl p-8 max-w-md w-full shadow-2xl modal-content">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 bg-[#333] bg-opacity-50 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-sign-out-alt text-2xl text-[#888]"></i>
+                </div>
+                <h3 class="font-['Montserrat'] font-bold text-2xl text-white">Sign Out</h3>
+            </div>
+            <p class="text-[#CCCCCC] mb-6 leading-relaxed font-['Inter']">
+                Are you sure you want to sign out?
+            </p>
+            <div class="flex gap-3">
+                <button id="cancelLogout" class="flex-1 bg-[#1A1A1A] hover:bg-[#262626] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter'] border border-[#333]">
+                    Cancel
+                </button>
+                <button id="confirmLogout" class="flex-1 bg-[#666] hover:bg-[#777] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter']">
+                    Sign Out
+                </button>
+            </div>
+        </div>
+    </div>
+    <nav class="w-full py-6 px-6 md:px-12">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Resonate" class="h-10 w-10 object-contain">
+                <span class="font-['Montserrat'] font-bold text-2xl tracking-tight text-white">Resonate</span>
+            </div>
+            <div class="logout-icon" id="logoutIcon" title="Sign Out">
+                <i class="fas fa-sign-out-alt text-lg"></i>
+            </div>
+        </div>
+    </nav>
+    <main class="flex-1 flex items-center justify-center">
+    </main>
+    <script type="module">
+        import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        const logoutIcon = document.getElementById('logoutIcon');
+        const logoutModal = document.getElementById('logoutModal');
+        const cancelLogout = document.getElementById('cancelLogout');
+        const confirmLogout = document.getElementById('confirmLogout');
+
+        function showModal() {
+            logoutModal.classList.remove('hidden');
+            logoutModal.classList.add('flex');
+        }
+
+        function hideModal() {
+            logoutModal.classList.add('hidden');
+            logoutModal.classList.remove('flex');
+        }
+
+        logoutIcon.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            showModal();
+        });
+
+        cancelLogout.addEventListener('click', hideModal);
+        confirmLogout.addEventListener('click', async () => {
+            try {
+                const auth = getAuth();
+                await signOut(auth);
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Error signing out:', error);
+                hideModal();
+            }
+        });
+        logoutModal.addEventListener('click', (e) => {
+            if (e.target === logoutModal) {
+                hideModal();
+            }
+        });
+    </script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
