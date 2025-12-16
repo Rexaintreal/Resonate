@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resonate - Visualize Sound Frequencies</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <a href="https://hackclub.com/" target="_blank" class="block z-[60]">
+        <img src="{{ url_for('static', filename='assets/hackclubflagfromleft.png') }}" alt="Hack Club Flag" class="hackclub-banner">
+    </a>
+    <nav class="relative z-50 w-full pt-6 pb-4 px-6 md:px-12 pointer-events-auto">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3 ml-24 md:ml-32">
+                <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Resonate" class="h-10 w-10 object-contain">
+                <span class="font-['Montserrat'] font-bold text-2xl tracking-tight text-white">Resonate</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="https://hackclub.com/" target="_blank" class="hover:opacity-80 transition-opacity p-1">
+                    <img src="{{ url_for('static', filename='assets/hackclub.png') }}" alt="Hack Club" class="h-6 w-6 object-contain">
+                </a>
+                <a href="https://github.com/Rexaintreal/Resonate" target="_blank" class="text-[#888888] hover:text-white transition-colors p-1">
+                    <i class="fab fa-github text-2xl"></i>
+                </a>
+                <div class="hidden md:flex items-center pl-4 border-l border-[#333] ml-2">
+                    <a href="/auth" class="btn-pill-white text-sm">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="flex-1 flex flex-col items-center justify-center px-6 relative z-0 mt-[-20px]">
+        <div class="text-center w-full max-w-5xl mx-auto">
+            <div class="content">
+                <h2>Resonate</h2>
+                <h2>Resonate</h2>
+            </div>
+            <p class="text-lg md:text-xl text-[#888888] max-w-2xl mx-auto leading-relaxed" style="margin-top: 8px;">
+                Visualize sound frequencies in realtime using your laptop microphone and FFT signal processing.
+            </p>
+            <div class="flex items-center justify-center gap-4">
+                <a href="/home" class="btn-pill-explore text-base">Explore</a>
+            </div>
+        </div>
+    </main>
+    <footer class="py-8 relative z-10 mt-auto">
+        <div class="waves">
+            <svg class="editorial" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none">
+                <defs>
+                    <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                </defs>
+                <g class="parallax">
+                    <use xlink:href="#gentle-wave" x="50" y="0" />
+                    <use xlink:href="#gentle-wave" x="50" y="3" />
+                    <use xlink:href="#gentle-wave" x="50" y="6" />
+                </g>
+            </svg>
+        </div>
+        <div class="max-w-7xl mx-auto px-6 flex justify-center text-sm text-[#CCCCCC] relative z-20">
+            <p class="flex items-center gap-2">
+                Made for 
+                <a href="https://axiom.hackclub.com/" target="_blank" class="hover:opacity-80 transition-opacity">
+                    <img src="{{ url_for('static', filename='assets/axiom.png') }}" alt="Axiom" class="h-5">
+                </a> 
+                by 
+                <a href="https://saurabhcodesawfully.pythonanywhere.com/" target="_blank" class="text-white font-medium hover:text-[#00FFFF] transition-colors">
+                    Saurabh Tiwari
+                </a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

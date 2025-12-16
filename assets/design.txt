@@ -39,6 +39,8 @@ Button Text (Primary) - White (#FFFFFF)	Text inside the primary action buttons.
 
 Fonts
 Headings/Titles - Montserrat
-Body/UI - interactive
+Body/UI - inter variable
 
 Logo - assets/logo.png
+
+Credits - Landing Page - https://codepen.io/techgirldiaries/pen/LYWPJPN, https://codepen.io/andyfitz/pen/aZrKdV

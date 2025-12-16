@@ -1,0 +1,177 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #000000;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.content {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 120px;
+}
+
+.content h2 {
+    font-family: 'Montserrat', sans-serif;
+    color: #fff;
+    font-size: 6em;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    white-space: nowrap;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.content h2:nth-child(1) {
+    color: transparent;
+    -webkit-text-stroke: 2px #00FFFF;
+}
+
+.content h2:nth-child(2) {
+    color: #00FFFF;
+    animation: liquidAnimate 4s ease-in-out infinite;
+}
+
+@keyframes liquidAnimate {
+    0%, 100% {
+        clip-path: polygon(0% 45%, 16% 44%, 33% 50%, 54% 60%, 70% 61%, 84% 59%, 100% 52%, 100% 100%, 0% 100%);
+    }
+    50% {
+        clip-path: polygon(0% 60%, 15% 65%, 34% 66%, 51% 62%, 67% 50%, 84% 45%, 100% 46%, 100% 100%, 0% 100%);
+    }
+}
+
+.hackclub-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 120px;
+    z-index: 60;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.hackclub-banner:hover {
+    transform: translateY(5px);
+}
+
+.btn-pill-white {
+    background-color: #262626;
+    color: #F4F4F4;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-pill-white:hover {
+    background-color: #333333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.btn-pill-explore {
+    background-color: #FFFFFF;
+    color: #000000;
+    border-radius: 9999px;
+    padding: 12px 32px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 35px;
+}
+
+.btn-pill-explore:hover {
+    background-color: #e2e2e2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.waves {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 15em;
+    min-height: 150px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.editorial {
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.parallax > use {
+    animation: move-forever 12s linear infinite;
+}
+
+.parallax > use:nth-child(1) {
+    animation-delay: -2s;
+    fill: rgba(0, 255, 255, 0.7);
+}
+
+.parallax > use:nth-child(2) {
+    animation-delay: -2s;
+    animation-duration: 5s;
+    fill: rgba(0, 200, 200, 0.5);
+}
+
+.parallax > use:nth-child(3) {
+    animation-delay: -4s;
+    animation-duration: 3s;
+    fill: rgba(0, 150, 150, 0.3);
+}
+
+@keyframes move-forever {
+    0% {
+        transform: translate(-90px, 0%);
+    }
+    100% {
+        transform: translate(85px, 0%);
+    }
+}
+
+footer {
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    .content h2 {
+        font-size: 3.5em;
+    }
+    .hackclub-banner {
+        width: 80px;
+    }
+    nav {
+        padding: 15px 20px;
+    }
+    .waves {
+        height: 20vw;
+    }
+}
