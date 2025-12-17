@@ -6,198 +6,10 @@
     <title>Home - Resonate</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/visualizer.css') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: #0A0A0A;
-            color: #E5E5E5;
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logout-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #262626;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #A3A3A3;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid #404040;
-        }
-
-        .logout-icon:hover {
-            background: #333333;
-            color: #14B8A6;
-            border-color: #14B8A6;
-            transform: translateY(-2px);
-        }
-        .modal-overlay {
-            background-color: rgba(0, 0, 0, 0.9);
-            animation: overlayFadeIn 0.2s ease-out;
-        }
-
-        .modal-content {
-            animation: modalFadeIn 0.3s ease-out;
-        }
-
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        @keyframes overlayFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .visualizer-container {
-            width: 100%;
-            max-width: 1200px;
-            padding: 20px;
-        }
-
-        .start-button {
-            background: linear-gradient(135deg, #14B8A6 0%, #0F766E 100%);
-            color: #FFFFFF;
-            border: none;
-            border-radius: 50px;
-            padding: 14px 40px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Montserrat', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 20px rgba(20, 184, 166, 0.3);
-        }
-
-        .start-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 30px rgba(20, 184, 166, 0.5);
-        }
-
-        .start-button:disabled {
-            background: #262626;
-            color: #525252;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .mode-selector {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .mode-btn {
-            background: #171717;
-            border: 2px solid #262626;
-            color: #A3A3A3;
-            padding: 10px 24px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .mode-btn:hover {
-            border-color: #14B8A6;
-            color: #14B8A6;
-        }
-
-        .mode-btn.active {
-            background: linear-gradient(135deg, #14B8A6 0%, #0F766E 100%);
-            border-color: #14B8A6;
-            color: #FFFFFF;
-        }
-
-        .visualizer-canvas {
-            width: 100%;
-            height: 350px;
-            background: #171717;
-            border-radius: 16px;
-            border: 1px solid #262626;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .stat-card {
-            background: #171717;
-            border: 1px solid #262626;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-
-        .stat-card:hover {
-            border-color: #14B8A6;
-            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.1);
-        }
-
-        .stat-label {
-            color: #737373;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-
-        .stat-value {
-            color: #14B8A6;
-            font-size: 28px;
-            font-weight: 700;
-            font-family: 'Montserrat', sans-serif;
-        }
-
-        .info-box {
-            background: #171717;
-            border: 1px solid #262626;
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 16px;
-            text-align: center;
-        }
-
-        .info-box p {
-            color: #A3A3A3;
-            line-height: 1.6;
-            font-size: 14px;
-        }
-
-        .text-green-400 {
-            color: #14B8A6 !important;
-        }
-
-        .text-red-400 {
-            color: #EF4444 !important;
-        }
-    </style>
     <script>
         window.FIREBASE_CONFIG = {
             FIREBASE_API_KEY: "{{ config.FIREBASE_API_KEY }}",
@@ -302,23 +114,18 @@
         const cancelLogout = document.getElementById('cancelLogout');
         const confirmLogout = document.getElementById('confirmLogout');
 
-        function showModal() {
-            logoutModal.classList.remove('hidden');
-            logoutModal.classList.add('flex');
-        }
-
-        function hideModal() {
-            logoutModal.classList.add('hidden');
-            logoutModal.classList.remove('flex');
-        }
-
         logoutIcon.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            showModal();
+            logoutModal.classList.remove('hidden');
+            logoutModal.classList.add('flex');
         });
 
-        cancelLogout.addEventListener('click', hideModal);
+        cancelLogout.addEventListener('click', () => {
+            logoutModal.classList.add('hidden');
+            logoutModal.classList.remove('flex');
+        });
+
         confirmLogout.addEventListener('click', async () => {
             try {
                 const auth = getAuth();
@@ -327,22 +134,19 @@
                 window.location.href = '/';
             } catch (error) {
                 console.error('Error signing out:', error);
-                hideModal();
             }
         });
         logoutModal.addEventListener('click', (e) => {
             if (e.target === logoutModal) {
-                hideModal();
+                logoutModal.classList.add('hidden');
+                logoutModal.classList.remove('flex');
             }
         });
     </script>
     <script type="module">
-        import { AudioCapture } from '{{ url_for("static", filename="js/audio.js") }}';
-        import { FFTProcessor } from '{{ url_for("static", filename="js/fft_processor.js") }}';
+        import { Visualizer } from '{{ url_for("static", filename="js/visualizer.js") }}';
 
         const startButton = document.getElementById('startButton');
-        const canvas = document.getElementById('visualizerCanvas');
-        const ctx = canvas.getContext('2d');
         const volumeStat = document.getElementById('volumeStat');
         const frequencyStat = document.getElementById('frequencyStat');
         const bassStat = document.getElementById('bassStat');
@@ -351,22 +155,15 @@
         const infoBox = document.getElementById('infoBox');
         const modeButtons = document.querySelectorAll('.mode-btn');
 
-        let audioCapture = null;
-        let fftProcessor = null;
+        const visualizer = new Visualizer();
         let isRunning = false;
-        let animationId = null;
-        let currentMode = 'bars';
-
-
-        canvas.width = canvas.offsetWidth * window.devicePixelRatio;
-        canvas.height = canvas.offsetHeight * window.devicePixelRatio;
-        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        let statsInterval = null;
 
         modeButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 modeButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                currentMode = btn.dataset.mode;
+                visualizer.setMode(btn.dataset.mode);
             });
         });
 
@@ -376,16 +173,23 @@
                     startButton.disabled = true;
                     startButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Initializing...';
 
-                    audioCapture = new AudioCapture();
-                    await audioCapture.initialize();
-                    fftProcessor = new FFTProcessor(audioCapture);
+                    await visualizer.start();
 
                     isRunning = true;
                     startButton.innerHTML = '<i class="fas fa-stop mr-2"></i> Stop Microphone';
                     startButton.disabled = false;
                     infoBox.innerHTML = '<p><i class="fas fa-check-circle mr-2 text-green-400"></i> Microphone active! Make some noise</p>';
 
-                    visualize();
+                    statsInterval = setInterval(() => {
+                        const stats = visualizer.getStats();
+                        if (stats) {
+                            volumeStat.textContent = stats.volume + '%';
+                            frequencyStat.textContent = stats.dominant.frequency + ' Hz';
+                            bassStat.textContent = stats.ranges.bass + '%';
+                            midStat.textContent = stats.ranges.mid + '%';
+                            trebleStat.textContent = stats.ranges.treble + '%';
+                        }
+                    }, 50);
                 } catch (error) {
                     console.error('Error:', error);
                     startButton.innerHTML = '<i class="fas fa-microphone mr-2"></i> Start Microphone';
@@ -394,11 +198,10 @@
                 }
             } else {
                 isRunning = false;
-                if (animationId) cancelAnimationFrame(animationId);
-                if (audioCapture) audioCapture.stop();
+                if (statsInterval) clearInterval(statsInterval);
+                visualizer.stop();
                 startButton.innerHTML = '<i class="fas fa-microphone mr-2"></i> Start Microphone';
                 infoBox.innerHTML = '<p><i class="fas fa-info-circle mr-2"></i> Click "Start Microphone" to begin</p>';
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 volumeStat.textContent = '0%';
                 frequencyStat.textContent = '0 Hz';
                 bassStat.textContent = '0%';
@@ -406,127 +209,6 @@
                 trebleStat.textContent = '0%';
             }
         });
-
-        function visualize() {
-            if (!isRunning) return;
-
-            const width = canvas.offsetWidth;
-            const height = canvas.offsetHeight;
-            const bars = fftProcessor.getFrequencyBars(64);
-            const waveform = fftProcessor.getWaveform(512);
-
-            ctx.clearRect(0, 0, width, height);
-
-            if (currentMode === 'bars') {
-                drawBars(bars, width, height);
-            } else if (currentMode === 'wave') {
-                drawWaveform(waveform, width, height);
-            } else if (currentMode === 'circular') {
-                drawCircular(bars, width, height);
-            } else if (currentMode === 'line') {
-                drawLine(bars, width, height);
-            }
-
-            const volume = audioCapture.getVolume();
-            volumeStat.textContent = volume + '%';
-
-            const dominant = fftProcessor.getDominantFrequency();
-            frequencyStat.textContent = dominant.frequency + ' Hz';
-
-            const ranges = fftProcessor.getFrequencyRanges();
-            bassStat.textContent = ranges.bass + '%';
-            midStat.textContent = ranges.mid + '%';
-            trebleStat.textContent = ranges.treble + '%';
-
-            animationId = requestAnimationFrame(visualize);
-        }
-
-        function drawBars(bars, width, height) {
-            const barWidth = width / bars.length;
-            const gradient = ctx.createLinearGradient(0, height, 0, 0);
-            gradient.addColorStop(0, '#14B8A6');
-            gradient.addColorStop(1, '#2DD4BF');
-
-            bars.forEach((bar, i) => {
-                const barHeight = (bar / 100) * height * 0.8;
-                const x = i * barWidth;
-                const y = height - barHeight;
-
-                ctx.fillStyle = gradient;
-                ctx.fillRect(x, y, barWidth - 2, barHeight); 
-            });
-        }
-
-        function drawWaveform(waveform, width, height) {
-            ctx.beginPath();
-            ctx.strokeStyle = '#14B8A6';
-            ctx.lineWidth = 2; 
-
-            const sliceWidth = width / waveform.length;
-            let x = 0;
-
-
-
-            waveform.forEach((value, i) => {
-                const y = (value * 0.5 + 0.5) * height;
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-                x += sliceWidth;
-            });
-
-            ctx.stroke();
-        }
-
-        function drawCircular(bars, width, height) {
-            const centerX = width / 2;
-            const centerY = height / 2;
-            const radius = Math.min(width, height) * 0.3;
-
-            bars.forEach((bar, i) => {
-                const angle = (i / bars.length) * Math.PI * 2;
-                const barHeight = (bar / 100) * radius * 0.7;
-                const x1 = centerX + Math.cos(angle) * radius;
-                const y1 = centerY + Math.sin(angle) * radius;
-                const x2 = centerX + Math.cos(angle) * (radius + barHeight);
-                const y2 = centerY + Math.sin(angle) * (radius + barHeight);
-                const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
-                gradient.addColorStop(0, '#14B8A6');
-                gradient.addColorStop(1, '#2DD4BF');
-                ctx.strokeStyle = gradient;
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.stroke();
-            });
-        }
-        function drawLine(bars, width, height) {
-            ctx.beginPath();
-            ctx.strokeStyle = '#14B8A6';
-            ctx.lineWidth = 3;
-            ctx.lineJoin = 'round';
-
-            const step = width / bars.length;
-            bars.forEach((bar, i) => {
-                const x = i * step;
-                const y = height - (bar / 100) * height * 0.8;
-
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            });
-            ctx.stroke();
-            ctx.fillStyle = 'rgba(20, 184, 166, 0.1)';
-            ctx.lineTo(width, height);
-            ctx.lineTo(0, height);
-            ctx.closePath();
-            ctx.fill();
-        }
     </script>
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
