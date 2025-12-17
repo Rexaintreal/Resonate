@@ -106,6 +106,79 @@
             </div>
         </div>
     </main>
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h3><i class="fas fa-cog mr-2"></i> Settings</h3>
+            <button id="closeSettings" class="close-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="settings-content">
+            <div class="setting-group">
+                <label class="setting-label">
+                    <i class="fas fa-signal mr-2"></i> FFT Size
+                    <span class="setting-info">Higher = more detail, lower = faster</span>
+                </label>
+                <select id="fftSize" class="setting-select">
+                    <option value="512">512 - Fast</option>
+                    <option value="1024">1024 - Balanced</option>
+                    <option value="2048" selected>2048 - Detailed</option>
+                    <option value="4096">4096 - Max Detail</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label class="setting-label">
+                    <i class="fas fa-chart-line mr-2"></i> Smoothing
+                    <span class="setting-value" id="smoothingValue">0.8</span>
+                </label>
+                <input type="range" id="smoothing" class="setting-slider" 
+                       min="0" max="0.95" step="0.05" value="0.8">
+                <div class="slider-labels">
+                    <span>Instant</span>
+                    <span>Smooth</span>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label class="setting-label">
+                    <i class="fas fa-volume-up mr-2"></i> Sensitivity
+                    <span class="setting-value" id="sensitivityValue">100%</span>
+                </label>
+                <input type="range" id="sensitivity" class="setting-slider" 
+                       min="50" max="200" step="10" value="100">
+                <div class="slider-labels">
+                    <span>Low</span>
+                    <span>High</span>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label class="setting-label">
+                    <i class="fas fa-tachometer-alt mr-2"></i> Bar Count
+                    <span class="setting-value" id="barCountValue">64</span>
+                </label>
+                <input type="range" id="barCount" class="setting-slider" 
+                       min="32" max="128" step="16" value="64">
+                <div class="slider-labels">
+                    <span>32</span>
+                    <span>128</span>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <button id="resetSettings" class="reset-btn">
+                    <i class="fas fa-undo mr-2"></i> Reset to Defaults
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <button id="settingsBtn" class="settings-btn" title="Settings">
+        <i class="fas fa-cog"></i>
+    </button>
+
     <script type="module">
         import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
@@ -145,6 +218,7 @@
     </script>
     <script type="module">
         import { Visualizer } from '{{ url_for("static", filename="js/visualizer.js") }}';
+        import { Settings } from '{{ url_for("static", filename="js/settings.js") }}';
 
         const startButton = document.getElementById('startButton');
         const volumeStat = document.getElementById('volumeStat');
@@ -155,6 +229,7 @@
         const infoBox = document.getElementById('infoBox');
         const modeButtons = document.querySelectorAll('.mode-btn');
 
+        window.settingsManager = new Settings();
         const visualizer = new Visualizer();
         let isRunning = false;
         let statsInterval = null;
@@ -173,7 +248,12 @@
                     startButton.disabled = true;
                     startButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Initializing...';
 
+                    const settings = window.settingsManager.getSettings();
                     await visualizer.start();
+                    if (visualizer.audioCapture && visualizer.audioCapture.analyser) {
+                        visualizer.audioCapture.analyser.fftSize = settings.fftSize;
+                        visualizer.audioCapture.analyser.smoothingTimeConstant = settings.smoothing;
+                    }
 
                     isRunning = true;
                     startButton.innerHTML = '<i class="fas fa-stop mr-2"></i> Stop Microphone';
@@ -188,6 +268,11 @@
                             bassStat.textContent = stats.ranges.bass + '%';
                             midStat.textContent = stats.ranges.mid + '%';
                             trebleStat.textContent = stats.ranges.treble + '%';
+                        }
+                        
+                        if (visualizer.audioCapture && visualizer.audioCapture.analyser) {
+                            const currentSettings = window.settingsManager.getSettings();
+                            visualizer.audioCapture.analyser.smoothingTimeConstant = currentSettings.smoothing;
                         }
                     }, 50);
                 } catch (error) {

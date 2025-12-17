@@ -88,6 +88,9 @@ export class Visualizer {
         const minFreq = 20;
         const maxFreq = 8000;
         
+        const sensitivity = window.settingsManager ? 
+            window.settingsManager.getSettings().sensitivity / 100 : 1;
+        
         for (let i = 0; i < barCount; i++) {
             const logMin = Math.log10(minFreq);
             const logMax = Math.log10(maxFreq);
@@ -111,17 +114,18 @@ export class Visualizer {
             const average = count > 0 ? sum / count : 0;
             const normalized = (average / 255) * 100;
             
-            const boost = 1.2 + (i / barCount) * 1.5;
-            const scaled = Math.pow(normalized / 100, 0.6) * 100 * boost;
+            const baseBoost = 0.8 + (i / barCount) * 0.4;
+            const scaled = Math.pow(normalized / 100, 0.7) * 100 * baseBoost * sensitivity;
             
-            bars.push(Math.min(95, scaled));
+            bars.push(Math.min(100, scaled));
         }
         
         return bars;
     }
 
     drawBars(width, height) {
-        const bars = this.getLogFrequencyData(64);
+        const barCount = window.settingsManager ? window.settingsManager.getSettings().barCount : 64;
+        const bars = this.getLogFrequencyData(barCount);
         const barWidth = width / bars.length;
         const gradient = this.ctx.createLinearGradient(0, height, 0, 0);
         gradient.addColorStop(0, '#14B8A6');
@@ -169,7 +173,8 @@ export class Visualizer {
     }
 
     drawCircular(width, height) {
-        const bars = this.getLogFrequencyData(100);
+        const barCount = window.settingsManager ? Math.floor(window.settingsManager.getSettings().barCount * 1.5) : 100;
+        const bars = this.getLogFrequencyData(barCount);
         const centerX = width / 2;
         const centerY = height / 2;
         const maxRadius = Math.min(width, height) * 0.42;
@@ -218,7 +223,9 @@ export class Visualizer {
 
 
     drawLine(width, height) {
-        const bars = this.getLogFrequencyData(80);
+        const barCount = window.settingsManager ? 
+            Math.floor(window.settingsManager.getSettings().barCount * 1.25) : 80;
+        const bars = this.getLogFrequencyData(barCount);
         
         this.ctx.beginPath();
         this.ctx.strokeStyle = '#14B8A6';
