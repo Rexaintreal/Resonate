@@ -10,6 +10,9 @@ export class Visualizer {
         this.isRunning = false;
         this.animationId = null;
         this.currentMode = 'bars';
+        this.audioElement = null;
+        this.audioContext = null;
+        this.sourceNode = null;
         
         this.setupCanvas();
     }
@@ -35,14 +38,69 @@ export class Visualizer {
         this.animate();
     }
 
+    async startWithAudio(audioElement) {
+        this.audioElement = audioElement;
+        
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.analyser = this.audioContext.createAnalyser();
+        this.analyser.fftSize = 2048;
+        this.analyser.smoothingTimeConstant = 0.8;
+        
+        this.sourceNode = this.audioContext.createMediaElementSource(audioElement);
+        this.sourceNode.connect(this.analyser);
+        this.analyser.connect(this.audioContext.destination);
+        
+        this.bufferLength = this.analyser.frequencyBinCount;
+        this.dataArray = new Uint8Array(this.bufferLength);
+        
+        this.audioCapture = {
+            getFrequencyData: () => {
+                this.analyser.getByteFrequencyData(this.dataArray);
+                return this.dataArray;
+            },
+            getWaveformData: () => {
+                this.analyser.getByteTimeDomainData(this.dataArray);
+                return this.dataArray;
+            },
+            getVolume: () => {
+                this.analyser.getByteFrequencyData(this.dataArray);
+                let sum = 0;
+                for (let i = 0; i < this.dataArray.length; i++) {
+                    sum += this.dataArray[i];
+                }
+                const average = sum / this.dataArray.length;
+                return Math.round((average / 255) * 100);
+            },
+            getSampleRate: () => this.audioContext.sampleRate,
+            indexToFrequency: (index) => {
+                const nyquist = this.audioContext.sampleRate / 2;
+                return (index * nyquist) / this.bufferLength;
+            },
+            analyser: this.analyser
+        };
+        
+        this.fftProcessor = new FFTProcessor(this.audioCapture);
+        this.isRunning = true;
+        this.animate();
+    }
+
     stop() {
         this.isRunning = false;
         if (this.animationId) {
             cancelAnimationFrame(this.animationId);
         }
-        if (this.audioCapture) {
+        if (this.audioCapture && this.audioCapture.stop) {
             this.audioCapture.stop();
         }
+        if (this.sourceNode) {
+            this.sourceNode.disconnect();
+            this.sourceNode = null;
+        }
+        if (this.audioContext && this.audioContext.state !== 'closed') {
+            this.audioContext.close();
+            this.audioContext = null;
+        }
+        this.audioElement = null;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 

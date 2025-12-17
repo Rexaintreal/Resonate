@@ -13,6 +13,8 @@ let isRunning = false;
 let isRecording = false;
 let statsInterval = null;
 let timerInterval = null;
+let currentAudio = null;
+let currentPlayingItem = null;
 
 const startButton = document.getElementById('startButton');
 const recordButton = document.getElementById('recordButton');
@@ -31,6 +33,15 @@ const logoutIcon = document.getElementById('logoutIcon');
 const logoutModal = document.getElementById('logoutModal');
 const cancelLogout = document.getElementById('cancelLogout');
 const confirmLogout = document.getElementById('confirmLogout');
+const deleteModal = document.getElementById('deleteModal');
+const cancelDelete = document.getElementById('cancelDelete');
+const confirmDelete = document.getElementById('confirmDelete');
+const formatModal = document.getElementById('formatModal');
+const cancelFormat = document.getElementById('cancelFormat');
+
+let pendingDeleteFilename = null;
+let pendingDownloadUrl = null;
+let pendingDownloadFilename = null;
 
 logoutIcon.addEventListener('click', (e) => {
     e.preventDefault();
@@ -62,6 +73,86 @@ logoutModal.addEventListener('click', (e) => {
     }
 });
 
+cancelDelete.addEventListener('click', () => {
+    deleteModal.classList.add('hidden');
+    deleteModal.classList.remove('flex');
+    pendingDeleteFilename = null;
+});
+
+confirmDelete.addEventListener('click', async () => {
+    if (pendingDeleteFilename) {
+        try {
+            const response = await fetch('/api/delete-recording', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename: pendingDeleteFilename })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                await loadRecordings();
+                infoBox.innerHTML = '<p class="text-green-400">Recording deleted successfully</p>';
+                setTimeout(() => {
+                    if (!isRunning) {
+                        infoBox.innerHTML = '<p>Click microphone to begin</p>';
+                    } else {
+                        infoBox.innerHTML = '<p class="text-green-400">Microphone active</p>';
+                    }
+                }, 2000);
+            } else {
+                infoBox.innerHTML = '<p class="text-red-400">Failed to delete recording</p>';
+            }
+        } catch (error) {
+            console.error('Error deleting recording:', error);
+            infoBox.innerHTML = '<p class="text-red-400">Failed to delete recording</p>';
+        }
+    }
+    deleteModal.classList.add('hidden');
+    deleteModal.classList.remove('flex');
+    pendingDeleteFilename = null;
+});
+
+deleteModal.addEventListener('click', (e) => {
+    if (e.target === deleteModal) {
+        deleteModal.classList.add('hidden');
+        deleteModal.classList.remove('flex');
+        pendingDeleteFilename = null;
+    }
+});
+
+cancelFormat.addEventListener('click', () => {
+    formatModal.classList.add('hidden');
+    formatModal.classList.remove('flex');
+    pendingDownloadUrl = null;
+    pendingDownloadFilename = null;
+});
+
+document.querySelectorAll('.format-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const format = btn.dataset.format;
+        if (pendingDownloadUrl && pendingDownloadFilename) {
+            const a = document.createElement('a');
+            a.href = pendingDownloadUrl;
+            const baseName = pendingDownloadFilename.replace('.webm', '');
+            a.download = `${baseName}.${format}`;
+            a.click();
+        }
+        formatModal.classList.add('hidden');
+        formatModal.classList.remove('flex');
+        pendingDownloadUrl = null;
+        pendingDownloadFilename = null;
+    });
+});
+
+formatModal.addEventListener('click', (e) => {
+    if (e.target === formatModal) {
+        formatModal.classList.add('hidden');
+        formatModal.classList.remove('flex');
+        pendingDownloadUrl = null;
+        pendingDownloadFilename = null;
+    }
+});
+
 modeButtons.forEach(btn => {
     btn.addEventListener('click', () => {
         modeButtons.forEach(b => b.classList.remove('active'));
@@ -83,6 +174,23 @@ async function loadRecordings() {
     }
 }
 
+function stopCurrentAudio() {
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+    }
+    if (currentPlayingItem) {
+        currentPlayingItem.classList.remove('playing');
+        const playBtn = currentPlayingItem.querySelector('.play-btn');
+        if (playBtn) {
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            playBtn.classList.remove('playing');
+        }
+        currentPlayingItem = null;
+    }
+}
+
 function updateRecordingsList(recordings) {
     if (!recordings || recordings.length === 0) {
         recordingsList.innerHTML = '';
@@ -98,7 +206,7 @@ function updateRecordingsList(recordings) {
         const recNumber = recordings.length - index;
         
         return `
-            <div class="recording-item">
+            <div class="recording-item" data-filename="${rec.filename}">
                 <div class="recording-info">
                     <div class="recording-name">Recording ${recNumber}</div>
                     <div class="recording-meta">${dateStr} • ${timeStr}</div>
@@ -119,41 +227,104 @@ function updateRecordingsList(recordings) {
     }).join('');
 
     document.querySelectorAll('.play-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const audio = new Audio(btn.dataset.url);
-            audio.play().catch(err => console.error('Playback error:', err));
+        btn.addEventListener('click', async () => {
+            const recordingItem = btn.closest('.recording-item');
+            const url = btn.dataset.url;
+            
+            if (currentAudio && currentPlayingItem === recordingItem) {
+                if (currentAudio.paused) {
+                    currentAudio.play();
+                    btn.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    currentAudio.pause();
+                    btn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+                return;
+            }
+            
+            stopCurrentAudio();
+            
+            if (isRunning) {
+                isRunning = false;
+                if (statsInterval) {
+                    clearInterval(statsInterval);
+                    statsInterval = null;
+                }
+                visualizer.stop();
+                startButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                startButton.classList.remove('active');
+                recordButton.disabled = true;
+            }
+            
+            try {
+                currentAudio = new Audio(url);
+                currentPlayingItem = recordingItem;
+                
+                await visualizer.startWithAudio(currentAudio);
+                
+                recordingItem.classList.add('playing');
+                btn.innerHTML = '<i class="fas fa-pause"></i>';
+                btn.classList.add('playing');
+                
+                currentAudio.addEventListener('ended', () => {
+                    stopCurrentAudio();
+                    visualizer.stop();
+                    volumeStat.textContent = '0%';
+                    frequencyStat.textContent = '0 Hz';
+                    bassStat.textContent = '0%';
+                    midStat.textContent = '0%';
+                    trebleStat.textContent = '0%';
+                    infoBox.innerHTML = '<p>Click microphone to begin</p>';
+                });
+                
+                currentAudio.addEventListener('pause', () => {
+                    if (currentAudio && !currentAudio.ended) {
+                        btn.innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                });
+                
+                currentAudio.addEventListener('play', () => {
+                    btn.innerHTML = '<i class="fas fa-pause"></i>';
+                });
+                
+                await currentAudio.play();
+                
+                infoBox.innerHTML = '<p class="text-green-400">Playing recording</p>';
+                
+                statsInterval = setInterval(() => {
+                    const stats = visualizer.getStats();
+                    if (stats) {
+                        volumeStat.textContent = stats.volume + '%';
+                        frequencyStat.textContent = stats.dominant.frequency + ' Hz';
+                        bassStat.textContent = stats.ranges.bass + '%';
+                        midStat.textContent = stats.ranges.mid + '%';
+                        trebleStat.textContent = stats.ranges.treble + '%';
+                    }
+                }, 50);
+                
+            } catch (err) {
+                console.error('Playback error:', err);
+                stopCurrentAudio();
+                visualizer.stop();
+                infoBox.innerHTML = '<p class="text-red-400">Failed to play recording</p>';
+            }
         });
     });
 
     document.querySelectorAll('.download-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const a = document.createElement('a');
-            a.href = btn.dataset.url;
-            a.download = btn.dataset.filename;
-            a.click();
+            pendingDownloadUrl = btn.dataset.url;
+            pendingDownloadFilename = btn.dataset.filename;
+            formatModal.classList.remove('hidden');
+            formatModal.classList.add('flex');
         });
     });
 
     document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            if (confirm('Delete this recording?')) {
-                try {
-                    const response = await fetch('/api/delete-recording', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ filename: btn.dataset.filename })
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        await loadRecordings();
-                    } else {
-                        alert('Failed to delete recording');
-                    }
-                } catch (error) {
-                    console.error('Error deleting recording:', error);
-                }
-            }
+        btn.addEventListener('click', () => {
+            pendingDeleteFilename = btn.dataset.filename;
+            deleteModal.classList.remove('hidden');
+            deleteModal.classList.add('flex');
         });
     });
 }
@@ -193,6 +364,13 @@ async function uploadRecording(blob) {
 
 startButton.addEventListener('click', async () => {
     if (!isRunning) {
+        stopCurrentAudio();
+        visualizer.stop();
+        if (statsInterval) {
+            clearInterval(statsInterval);
+            statsInterval = null;
+        }
+        
         try {
             startButton.disabled = true;
             
