@@ -2,12 +2,14 @@ import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/fire
 import { Visualizer } from './visualizer.js';
 import { Settings } from './settings.js';
 import { AudioRecorder } from './recorder.js';
+import { AudioConverter } from './converter.js';
 
 console.log('Home app initializing...');
 
 window.settingsManager = new Settings();
 const visualizer = new Visualizer();
 const recorder = new AudioRecorder();
+const converter = new AudioConverter();
 
 let isRunning = false;
 let isRecording = false;
@@ -38,6 +40,8 @@ const cancelDelete = document.getElementById('cancelDelete');
 const confirmDelete = document.getElementById('confirmDelete');
 const formatModal = document.getElementById('formatModal');
 const cancelFormat = document.getElementById('cancelFormat');
+const formatOptions = document.getElementById('formatOptions');
+const conversionLoading = document.getElementById('conversionLoading');
 
 let pendingDeleteFilename = null;
 let pendingDownloadUrl = null;
@@ -123,22 +127,59 @@ deleteModal.addEventListener('click', (e) => {
 cancelFormat.addEventListener('click', () => {
     formatModal.classList.add('hidden');
     formatModal.classList.remove('flex');
+    formatOptions.classList.remove('hidden');
+    conversionLoading.classList.add('hidden');
+    conversionLoading.classList.remove('flex');
+    
     pendingDownloadUrl = null;
     pendingDownloadFilename = null;
 });
 
 document.querySelectorAll('.format-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
         const format = btn.dataset.format;
         if (pendingDownloadUrl && pendingDownloadFilename) {
-            const a = document.createElement('a');
-            a.href = pendingDownloadUrl;
-            const baseName = pendingDownloadFilename.replace('.webm', '');
-            a.download = `${baseName}.${format}`;
-            a.click();
+            formatOptions.classList.add('hidden');
+            conversionLoading.classList.remove('hidden');
+            conversionLoading.classList.add('flex');
+
+            try {
+                let downloadUrl = pendingDownloadUrl;
+                let finalFilename = pendingDownloadFilename.replace('.webm', '') + '.' + format;
+
+                if (format !== 'webm') {
+                    const blob = await converter.convert(pendingDownloadUrl, format);
+                    if (blob) {
+                        downloadUrl = URL.createObjectURL(blob);
+                    } else {
+                        throw new Error("Conversion returned null");
+                    }
+                }
+
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = finalFilename;
+                document.body.appendChild(a); 
+                a.click();
+                document.body.removeChild(a);
+
+                if (format !== 'webm') {
+                    setTimeout(() => URL.revokeObjectURL(downloadUrl), 100);
+                }
+
+            } catch (error) {
+                console.error('Conversion failed:', error);
+                alert('Failed to convert audio format. Please try again.');
+            }
         }
         formatModal.classList.add('hidden');
         formatModal.classList.remove('flex');
+        setTimeout(() => {
+            formatOptions.classList.remove('hidden');
+            conversionLoading.classList.add('hidden');
+            conversionLoading.classList.remove('flex');
+        }, 300);
+
         pendingDownloadUrl = null;
         pendingDownloadFilename = null;
     });
@@ -148,6 +189,9 @@ formatModal.addEventListener('click', (e) => {
     if (e.target === formatModal) {
         formatModal.classList.add('hidden');
         formatModal.classList.remove('flex');
+        formatOptions.classList.remove('hidden');
+        conversionLoading.classList.add('hidden');
+        conversionLoading.classList.remove('flex');
         pendingDownloadUrl = null;
         pendingDownloadFilename = null;
     }

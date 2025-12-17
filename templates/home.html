@@ -10,6 +10,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
     <script>
         window.FIREBASE_CONFIG = {
             FIREBASE_API_KEY: "{{ config.FIREBASE_API_KEY }}",
@@ -60,18 +61,27 @@
                 </div>
                 <h3 class="font-['Montserrat'] font-bold text-2xl text-white">Download Format</h3>
             </div>
-            <p class="text-[#A3A3A3] mb-6 leading-relaxed font-['Inter']">Choose the audio format for download:</p>
-            <div class="flex flex-col gap-3">
-                <button class="format-btn bg-[#262626] hover:bg-[#333333] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter'] border border-[#404040] text-left" data-format="mp3">
-                    <i class="fas fa-file-audio mr-2"></i> MP3 (Compressed)
-                </button>
-                <button class="format-btn bg-[#262626] hover:bg-[#333333] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter'] border border-[#404040] text-left" data-format="webm">
-                    <i class="fas fa-file-audio mr-2"></i> WebM (Original)
-                </button>
-                <button class="format-btn bg-[#262626] hover:bg-[#333333] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter'] border border-[#404040] text-left" data-format="wav">
-                    <i class="fas fa-file-audio mr-2"></i> WAV (Uncompressed)
-                </button>
-                <button id="cancelFormat" class="bg-[#171717] hover:bg-[#262626] text-[#737373] font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter'] border border-[#262626]">Cancel</button>
+            
+            <div id="formatOptions">
+                <p class="text-[#A3A3A3] mb-6 leading-relaxed font-['Inter']">Choose the audio format for download:</p>
+                <div class="flex flex-col gap-3">
+                    <button class="format-btn bg-[#262626] hover:bg-[#333333] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter'] border border-[#404040] text-left" data-format="mp3">
+                        <i class="fas fa-file-audio mr-2"></i> MP3 (Compressed)
+                    </button>
+                    <button class="format-btn bg-[#262626] hover:bg-[#333333] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter'] border border-[#404040] text-left" data-format="webm">
+                        <i class="fas fa-file-audio mr-2"></i> WebM (Original)
+                    </button>
+                    <button class="format-btn bg-[#262626] hover:bg-[#333333] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter'] border border-[#404040] text-left" data-format="wav">
+                        <i class="fas fa-file-audio mr-2"></i> WAV (Uncompressed)
+                    </button>
+                    <button id="cancelFormat" class="bg-[#171717] hover:bg-[#262626] text-[#737373] font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter'] border border-[#262626]">Cancel</button>
+                </div>
+            </div>
+
+            <div id="conversionLoading" class="hidden flex-col items-center justify-center py-4">
+                <i class="fas fa-circle-notch fa-spin text-4xl text-[#14B8A6] mb-4"></i>
+                <p class="text-white font-semibold">Converting Audio...</p>
+                <p class="text-sm text-[#737373]">Please wait</p>
             </div>
         </div>
     </div>
@@ -82,8 +92,13 @@
                 <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Resonate" class="h-8 w-8 object-contain">
                 <span class="font-['Montserrat'] font-bold text-xl tracking-tight text-white">Resonate</span>
             </div>
-            <div class="logout-icon" id="logoutIcon" title="Sign Out">
-                <i class="fas fa-sign-out-alt text-sm"></i>
+            <div class="flex items-center gap-3">
+                <button id="settingsBtn" class="nav-icon-btn" title="Settings">
+                    <i class="fas fa-cog text-sm"></i>
+                </button>
+                <div class="nav-icon-btn" id="logoutIcon" title="Sign Out">
+                    <i class="fas fa-sign-out-alt text-sm"></i>
+                </div>
             </div>
         </div>
     </nav>
@@ -221,10 +236,7 @@
         </div>
     </div>
 
-    <button id="settingsBtn" class="settings-btn" title="Settings">
-        <i class="fas fa-cog"></i>
-    </button>
-
+    <script type="module" src="{{ url_for('static', filename='js/converter.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
 </body>

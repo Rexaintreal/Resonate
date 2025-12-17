@@ -345,7 +345,7 @@ main {
     flex-shrink: 0;
 }
 
-.logout-icon {
+.nav-icon-btn {
     width: 32px;
     height: 32px;
     border-radius: 8px;
@@ -359,39 +359,18 @@ main {
     transition: all 0.2s ease;
 }
 
-.logout-icon:hover {
+.nav-icon-btn:hover {
     background: #262626;
     color: #14B8A6;
     border-color: #14B8A6;
+    box-shadow: 0 0 15px rgba(20, 184, 166, 0.1);
 }
 
 .modal-overlay {
     background-color: rgba(0, 0, 0, 0.9);
 }
 
-.settings-btn {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: #171717;
-    border: 1px solid #262626;
-    color: #737373;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 50;
-    transition: all 0.2s;
-}
 
-.settings-btn:hover {
-    color: #14B8A6;
-    border-color: #14B8A6;
-    box-shadow: 0 0 20px rgba(20, 184, 166, 0.1);
-}
 
 .settings-panel {
     position: fixed;
