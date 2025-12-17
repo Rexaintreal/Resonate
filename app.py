@@ -1,12 +1,27 @@
-from flask import Flask, render_template, session, redirect, url_for, request, jsonify
+from flask import Flask, render_template, session, redirect, url_for, request, jsonify, send_from_directory
 from functools import wraps
 import os
 from dotenv import load_dotenv
+from werkzeug.utils import secure_filename
+import uuid
+from datetime import datetime
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-here')
+
+UPLOAD_FOLDER = os.path.join('static', 'uploads')
+ALLOWED_EXTENSIONS = {'webm', 'wav', 'mp3', 'ogg'}
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024 
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.context_processor
 def inject_firebase_config():
@@ -89,5 +104,78 @@ def check_auth():
     except Exception as e:
         return jsonify({'authenticated': False, 'error': str(e)}), 500
 
+@app.route('/api/upload-recording', methods=['POST'])
+@login_required
+def upload_recording():
+    try:
+        if 'audio' not in request.files:
+            return jsonify({'success': False, 'error': 'No audio file provided'}), 400
+        
+        file = request.files['audio']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No file selected'}), 400
+        
+        user_id = session['user']['uid']
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        unique_id = str(uuid.uuid4())[:8]
+        filename = f"{user_id}_{timestamp}_{unique_id}.webm"
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        
+        return jsonify({
+            'success': True,
+            'filename': filename,
+            'url': url_for('static', filename=f'uploads/{filename}')
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/delete-recording', methods=['POST'])
+@login_required
+def delete_recording():
+    try:
+        data = request.get_json()
+        filename = data.get('filename')
+        
+        if not filename:
+            return jsonify({'success': False, 'error': 'No filename provided'}), 400
+        
+        user_id = session['user']['uid']
+        if not filename.startswith(user_id):
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename))
+        
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'File not found'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/get-recordings')
+@login_required
+def get_recordings():
+    try:
+        user_id = session['user']['uid']
+        recordings = []
+        
+        for filename in os.listdir(app.config['UPLOAD_FOLDER']):
+            if filename.startswith(user_id) and filename.endswith('.webm'):
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                recordings.append({
+                    'filename': filename,
+                    'url': url_for('static', filename=f'uploads/{filename}'),
+                    'timestamp': os.path.getctime(filepath)
+                })
+        
+        recordings.sort(key=lambda x: x['timestamp'], reverse=True)
+        
+        return jsonify({'success': True, 'recordings': recordings})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 if __name__ == '__main__':
-    app.run(host='localhost', port=5000, debug=True)
+    app.run(host='localhost', port=5000, debug=True) 

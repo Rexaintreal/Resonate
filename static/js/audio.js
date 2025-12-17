@@ -27,14 +27,13 @@ export class AudioCapture {
             this.bufferLength = this.analyser.frequencyBinCount;
             this.dataArray = new Uint8Array(this.bufferLength);
             this.isActive = true;
-            console.log('Microphone initialized successfully');
             return true;
         } catch (error) {
             console.error('Error accessing microphone:', error);
             if (error.name === 'NotAllowedError') {
-                throw new Error('Microphone access denied. Please allow microphone access.');
+                throw new Error('Microphone access denied');
             } else if (error.name === 'NotFoundError') {
-                throw new Error('No microphone found. Please connect a microphone.');
+                throw new Error('No microphone found');
             } else {
                 throw new Error('Failed to access microphone: ' + error.message);
             }
@@ -76,7 +75,6 @@ export class AudioCapture {
             this.audioContext.close();
         }
         this.isActive = false;
-        console.log('Microphone stopped');
     }
 
     isReady() {

@@ -37,78 +37,98 @@
             </div>
         </div>
     </div>
-    <nav class="w-full py-4 px-6 md:px-12">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
+
+    <nav class="w-full py-4 px-6 md:px-12 bg-[#0A0A0A] border-b border-[#262626]">
+        <div class="max-w-[1600px] mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Resonate" class="h-10 w-10 object-contain">
-                <span class="font-['Montserrat'] font-bold text-2xl tracking-tight text-white">Resonate</span>
+                <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Resonate" class="h-8 w-8 object-contain">
+                <span class="font-['Montserrat'] font-bold text-xl tracking-tight text-white">Resonate</span>
             </div>
             <div class="logout-icon" id="logoutIcon" title="Sign Out">
-                <i class="fas fa-sign-out-alt text-lg"></i>
+                <i class="fas fa-sign-out-alt text-sm"></i>
             </div>
         </div>
     </nav>
-    <main class="flex-1 flex items-center justify-center px-6 py-6">
-        <div class="visualizer-container">
-            <div class="text-center mb-6">
-                <h1 class="font-['Montserrat'] font-bold text-3xl md:text-4xl text-white mb-2">Sound Visualizer</h1>
-                <p class="text-base text-[#737373] font-['Inter']">See sound frequencies in real time</p>
+
+    <main class="flex-1 px-6 py-6">
+        <div class="main-layout">
+            
+            <div class="visualizer-section">
+                <div class="header-controls">
+                    <div>
+                        <h1 class="font-['Montserrat'] font-bold text-2xl text-white">Visualizer</h1>
+                        <p class="text-sm text-[#737373] font-['Inter']">Real-time frequency analysis</p>
+                    </div>
+                    
+                    <div class="controls-wrapper">
+                        <button id="startButton" class="control-btn primary">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button id="recordButton" class="control-btn danger" disabled>
+                            <div class="record-dot"></div>
+                        </button>
+                        <div id="recordingTimer" class="timer-badge" style="display: none;">
+                            <span id="timerDisplay">00:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="bars">Bars</button>
+                    <button class="mode-btn" data-mode="wave">Wave</button>
+                    <button class="mode-btn" data-mode="circular">Circle</button>
+                    <button class="mode-btn" data-mode="line">Line</button>
+                </div>
+
+                <canvas id="visualizerCanvas" class="visualizer-canvas"></canvas>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Volume</div>
+                        <div class="stat-value" id="volumeStat">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Freq</div>
+                        <div class="stat-value" id="frequencyStat">0 Hz</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Bass</div>
+                        <div class="stat-value" id="bassStat">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Mid</div>
+                        <div class="stat-value" id="midStat">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">High</div>
+                        <div class="stat-value" id="trebleStat">0%</div>
+                    </div>
+                </div>
+
+                <div class="info-box" id="infoBox">
+                    <p>Click microphone to begin</p>
+                </div>
             </div>
 
-            <div class="text-center mb-4">
-                <button id="startButton" class="start-button">
-                    <i class="fas fa-microphone mr-2"></i> Start Microphone
-                </button>
-            </div>
+            <aside class="sidebar-section">
+                <div class="sidebar-header">
+                    <h3 class="font-['Montserrat'] font-bold text-lg text-white">Library</h3>
+                    <span class="text-xs text-[#737373] uppercase tracking-wider">Saved Audio</span>
+                </div>
+                <div id="recordingsList" class="recordings-list">
+                    
+                </div>
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-music text-[#262626] text-4xl mb-3"></i>
+                    <p class="text-[#525252] text-sm">No recordings yet</p>
+                </div>
+            </aside>
 
-            <div class="mode-selector">
-                <button class="mode-btn active" data-mode="bars">
-                    <i class="fas fa-chart-bar mr-2"></i> Bars
-                </button>
-                <button class="mode-btn" data-mode="wave">
-                    <i class="fas fa-wave-square mr-2"></i> Waveform
-                </button>
-                <button class="mode-btn" data-mode="circular">
-                    <i class="fas fa-circle-notch mr-2"></i> Circular
-                </button>
-                <button class="mode-btn" data-mode="line">
-                    <i class="fas fa-chart-line mr-2"></i> Line
-                </button>
-            </div>
-
-            <canvas id="visualizerCanvas" class="visualizer-canvas"></canvas>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Volume</div>
-                    <div class="stat-value" id="volumeStat">0%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Frequency</div>
-                    <div class="stat-value" id="frequencyStat">0 Hz</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Bass</div>
-                    <div class="stat-value" id="bassStat">0%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Mid</div>
-                    <div class="stat-value" id="midStat">0%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Treble</div>
-                    <div class="stat-value" id="trebleStat">0%</div>
-                </div>
-            </div>
-
-            <div class="info-box" id="infoBox">
-                <p><i class="fas fa-info-circle mr-2"></i> Click "Start Microphone" and allow access to begin</p>
-            </div>
         </div>
     </main>
     <div class="settings-panel" id="settingsPanel">
         <div class="settings-header">
-            <h3><i class="fas fa-cog mr-2"></i> Settings</h3>
+            <h3>Settings</h3>
             <button id="closeSettings" class="close-btn">
                 <i class="fas fa-times"></i>
             </button>
@@ -117,59 +137,47 @@
         <div class="settings-content">
             <div class="setting-group">
                 <label class="setting-label">
-                    <i class="fas fa-signal mr-2"></i> FFT Size
-                    <span class="setting-info">Higher = more detail, lower = faster</span>
+                    FFT Size
+                    <span class="setting-info">Resolution</span>
                 </label>
                 <select id="fftSize" class="setting-select">
                     <option value="512">512 - Fast</option>
                     <option value="1024">1024 - Balanced</option>
                     <option value="2048" selected>2048 - Detailed</option>
-                    <option value="4096">4096 - Max Detail</option>
+                    <option value="4096">4096 - High Res</option>
                 </select>
             </div>
 
             <div class="setting-group">
                 <label class="setting-label">
-                    <i class="fas fa-chart-line mr-2"></i> Smoothing
+                    Smoothing
                     <span class="setting-value" id="smoothingValue">0.8</span>
                 </label>
                 <input type="range" id="smoothing" class="setting-slider" 
                        min="0" max="0.95" step="0.05" value="0.8">
-                <div class="slider-labels">
-                    <span>Instant</span>
-                    <span>Smooth</span>
-                </div>
             </div>
 
             <div class="setting-group">
                 <label class="setting-label">
-                    <i class="fas fa-volume-up mr-2"></i> Sensitivity
+                    Sensitivity
                     <span class="setting-value" id="sensitivityValue">100%</span>
                 </label>
                 <input type="range" id="sensitivity" class="setting-slider" 
                        min="50" max="200" step="10" value="100">
-                <div class="slider-labels">
-                    <span>Low</span>
-                    <span>High</span>
-                </div>
             </div>
 
             <div class="setting-group">
                 <label class="setting-label">
-                    <i class="fas fa-tachometer-alt mr-2"></i> Bar Count
+                    Bar Count
                     <span class="setting-value" id="barCountValue">64</span>
                 </label>
                 <input type="range" id="barCount" class="setting-slider" 
                        min="32" max="128" step="16" value="64">
-                <div class="slider-labels">
-                    <span>32</span>
-                    <span>128</span>
-                </div>
             </div>
 
             <div class="setting-group">
                 <button id="resetSettings" class="reset-btn">
-                    <i class="fas fa-undo mr-2"></i> Reset to Defaults
+                    Reset Defaults
                 </button>
             </div>
         </div>
@@ -179,122 +187,7 @@
         <i class="fas fa-cog"></i>
     </button>
 
-    <script type="module">
-        import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-
-        const logoutIcon = document.getElementById('logoutIcon');
-        const logoutModal = document.getElementById('logoutModal');
-        const cancelLogout = document.getElementById('cancelLogout');
-        const confirmLogout = document.getElementById('confirmLogout');
-
-        logoutIcon.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            logoutModal.classList.remove('hidden');
-            logoutModal.classList.add('flex');
-        });
-
-        cancelLogout.addEventListener('click', () => {
-            logoutModal.classList.add('hidden');
-            logoutModal.classList.remove('flex');
-        });
-
-        confirmLogout.addEventListener('click', async () => {
-            try {
-                const auth = getAuth();
-                await signOut(auth);
-                await fetch('/api/logout', { method: 'POST' });
-                window.location.href = '/';
-            } catch (error) {
-                console.error('Error signing out:', error);
-            }
-        });
-        logoutModal.addEventListener('click', (e) => {
-            if (e.target === logoutModal) {
-                logoutModal.classList.add('hidden');
-                logoutModal.classList.remove('flex');
-            }
-        });
-    </script>
-    <script type="module">
-        import { Visualizer } from '{{ url_for("static", filename="js/visualizer.js") }}';
-        import { Settings } from '{{ url_for("static", filename="js/settings.js") }}';
-
-        const startButton = document.getElementById('startButton');
-        const volumeStat = document.getElementById('volumeStat');
-        const frequencyStat = document.getElementById('frequencyStat');
-        const bassStat = document.getElementById('bassStat');
-        const midStat = document.getElementById('midStat');
-        const trebleStat = document.getElementById('trebleStat');
-        const infoBox = document.getElementById('infoBox');
-        const modeButtons = document.querySelectorAll('.mode-btn');
-
-        window.settingsManager = new Settings();
-        const visualizer = new Visualizer();
-        let isRunning = false;
-        let statsInterval = null;
-
-        modeButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                modeButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                visualizer.setMode(btn.dataset.mode);
-            });
-        });
-
-        startButton.addEventListener('click', async () => {
-            if (!isRunning) {
-                try {
-                    startButton.disabled = true;
-                    startButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Initializing...';
-
-                    const settings = window.settingsManager.getSettings();
-                    await visualizer.start();
-                    if (visualizer.audioCapture && visualizer.audioCapture.analyser) {
-                        visualizer.audioCapture.analyser.fftSize = settings.fftSize;
-                        visualizer.audioCapture.analyser.smoothingTimeConstant = settings.smoothing;
-                    }
-
-                    isRunning = true;
-                    startButton.innerHTML = '<i class="fas fa-stop mr-2"></i> Stop Microphone';
-                    startButton.disabled = false;
-                    infoBox.innerHTML = '<p><i class="fas fa-check-circle mr-2 text-green-400"></i> Microphone active! Make some noise</p>';
-
-                    statsInterval = setInterval(() => {
-                        const stats = visualizer.getStats();
-                        if (stats) {
-                            volumeStat.textContent = stats.volume + '%';
-                            frequencyStat.textContent = stats.dominant.frequency + ' Hz';
-                            bassStat.textContent = stats.ranges.bass + '%';
-                            midStat.textContent = stats.ranges.mid + '%';
-                            trebleStat.textContent = stats.ranges.treble + '%';
-                        }
-                        
-                        if (visualizer.audioCapture && visualizer.audioCapture.analyser) {
-                            const currentSettings = window.settingsManager.getSettings();
-                            visualizer.audioCapture.analyser.smoothingTimeConstant = currentSettings.smoothing;
-                        }
-                    }, 50);
-                } catch (error) {
-                    console.error('Error:', error);
-                    startButton.innerHTML = '<i class="fas fa-microphone mr-2"></i> Start Microphone';
-                    startButton.disabled = false;
-                    infoBox.innerHTML = `<p class="text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i> ${error.message}</p>`;
-                }
-            } else {
-                isRunning = false;
-                if (statsInterval) clearInterval(statsInterval);
-                visualizer.stop();
-                startButton.innerHTML = '<i class="fas fa-microphone mr-2"></i> Start Microphone';
-                infoBox.innerHTML = '<p><i class="fas fa-info-circle mr-2"></i> Click "Start Microphone" to begin</p>';
-                volumeStat.textContent = '0%';
-                frequencyStat.textContent = '0 Hz';
-                bassStat.textContent = '0%';
-                midStat.textContent = '0%';
-                trebleStat.textContent = '0%';
-            }
-        });
-    </script>
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
 </body>
 </html>
