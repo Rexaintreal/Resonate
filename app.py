@@ -59,6 +59,11 @@ def auth():
 def home():
     return render_template('home.html')
 
+@app.route('/pitch')
+@login_required
+def pitch():
+    return render_template('pitch.html')
+
 @app.route('/tuner')
 @login_required
 def tuner():
@@ -178,4 +183,4 @@ def get_recordings():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=5000, debug=True) 
+    app.run(host='localhost', port=5000, debug=True)

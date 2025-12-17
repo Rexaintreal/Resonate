@@ -86,19 +86,21 @@
         </div>
     </div>
 
-    <nav class="w-full py-4 px-6 md:px-12 bg-[#0A0A0A] border-b border-[#262626]">
-        <div class="max-w-[1600px] mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Resonate" class="h-8 w-8 object-contain">
-                <span class="font-['Montserrat'] font-bold text-xl tracking-tight text-white">Resonate</span>
-            </div>
-            <div class="flex items-center gap-3">
-                <button id="settingsBtn" class="nav-icon-btn" title="Settings">
-                    <i class="fas fa-cog text-sm"></i>
-                </button>
-                <div class="nav-icon-btn" id="logoutIcon" title="Sign Out">
-                    <i class="fas fa-sign-out-alt text-sm"></i>
+    <nav class="w-full py-4 px-6 md:px-12 border-b border-[#262626]">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-8">
+                <div class="flex items-center gap-3">
+                    <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Resonate" class="h-10 w-10 object-contain">
+                    <span class="font-['Montserrat'] font-bold text-2xl tracking-tight text-white">Resonate</span>
                 </div>
+                <div class="flex gap-6">
+                    <a href="/home" class="nav-link  text-[#14B8A6]">Visualizer</a>
+                    <a href="/pitch" class="nav-link">Pitch Detection</a>
+                    <a href="/tuner" class="nav-link">Tuner</a>
+                </div>
+            </div>
+            <div class="logout-icon" id="logoutIcon" title="Sign Out">
+                <i class="fas fa-sign-out-alt text-lg"></i>
             </div>
         </div>
     </nav>
