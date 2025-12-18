@@ -70,6 +70,13 @@ def tuner():
     return render_template('tuner.html')
 
 
+@app.route('/chords') 
+@login_required
+def chords():
+    return render_template('chords.html')  
+
+
+
 @app.route('/metronome')
 @login_required
 def metronome():
