@@ -69,6 +69,13 @@ def pitch():
 def tuner():
     return render_template('tuner.html')
 
+
+@app.route('/metronome')
+@login_required
+def metronome():
+    return render_template('metronome.html')
+
+
 @app.route('/api/login', methods=['POST'])
 def login():
     try:
