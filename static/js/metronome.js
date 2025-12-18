@@ -1,4 +1,6 @@
 import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { AudioCapture } from './audio.js';
+import { BPMDetector } from './bpm_detector.js';
 
 const logoutIcon = document.getElementById('logoutIcon');
 const logoutModal = document.getElementById('logoutModal');
@@ -16,6 +18,15 @@ const timeSigStat = document.getElementById('timeSigStat');
 const beatStat = document.getElementById('beatStat');
 const statusStat = document.getElementById('statusStat');
 const timeSigButtons = document.querySelectorAll('.time-sig-btn');
+const detectBpmBtn = document.getElementById('detectBpmBtn');
+const detectBtnText = document.getElementById('detectBtnText');
+const beatPulse = document.getElementById('beatPulse');
+const detectedBpmDisplay = document.getElementById('detectedBpmDisplay');
+const detectedBpmValue = document.getElementById('detectedBpmValue');
+const confidenceContainer = document.getElementById('confidenceContainer');
+const confidenceValue = document.getElementById('confidenceValue');
+const confidenceFill = document.getElementById('confidenceFill');
+const syncBpmBtn = document.getElementById('syncBpmBtn');
 
 let audioContext = null;
 let isRunning = false;
@@ -26,6 +37,10 @@ let nextNoteTime = 0;
 let scheduleAheadTime = 0.1;
 let timerID = null;
 let tapTimes = [];
+let bpmDetector = null;
+let audioCapture = null;
+let isDetecting = false;
+let detectionInterval = null;
 
 logoutIcon.addEventListener('click', (e) => {
     e.preventDefault();
@@ -210,9 +225,108 @@ tapTempoBtn.addEventListener('click', () => {
     }, 100);
 });
 
+detectBpmBtn.addEventListener('click', async () => {
+    if (!isDetecting) {
+        try {
+            if (!audioCapture) {
+                audioCapture = new AudioCapture();
+                await audioCapture.initialize();
+            }
+            
+            if (!bpmDetector) {
+                bpmDetector = new BPMDetector(audioCapture);
+            }
+            
+            bpmDetector.reset();
+            isDetecting = true;
+            
+            detectBpmBtn.classList.add('active');
+            detectBtnText.textContent = 'Detecting...';
+            detectedBpmDisplay.classList.add('visible');
+            confidenceContainer.style.opacity = '1';
+            
+            infoBox.innerHTML = '<p style="color: #F59E0B;">Listening for beats... Play some music!</p>';
+            
+            detectionInterval = setInterval(() => {
+                const result = bpmDetector.analyze();
+                
+                if (result) {
+                    if (result.beatDetected) {
+                        beatPulse.classList.add('active');
+                        setTimeout(() => beatPulse.classList.remove('active'), 100);
+                    }
+                    
+                    if (result.bpm > 0) {
+                        detectedBpmValue.textContent = result.bpm;
+                        confidenceValue.textContent = result.confidence + '%';
+                        confidenceFill.style.width = result.confidence + '%';
+                        
+                        if (result.confidence > 50) {
+                            syncBpmBtn.classList.add('visible');
+                        }
+                    }
+                }
+            }, 50);
+            
+        } catch (error) {
+            console.error('Error starting detection:', error);
+            infoBox.innerHTML = '<p style="color: #EF4444;">Failed to access microphone</p>';
+            isDetecting = false;
+            detectBpmBtn.classList.remove('active');
+            detectBtnText.textContent = 'Auto-Detect BPM';
+        }
+    } else {
+        isDetecting = false;
+        if (detectionInterval) {
+            clearInterval(detectionInterval);
+            detectionInterval = null;
+        }
+        
+        detectBpmBtn.classList.remove('active');
+        detectBtnText.textContent = 'Auto-Detect BPM';
+        beatPulse.classList.remove('active');
+        
+        if (audioCapture) {
+            audioCapture.stop();
+            audioCapture = null;
+        }
+        
+        infoBox.innerHTML = '<p>Click play to start metronome</p>';
+    }
+});
 
+syncBpmBtn.addEventListener('click', () => {
+    if (bpmDetector && bpmDetector.isReady()) {
+        const detectedBPM = bpmDetector.getBPM();
+        
+        if (detectedBPM >= 40 && detectedBPM <= 240) {
+            bpm = detectedBPM;
+            bpmDisplay.textContent = bpm;
+            bpmSlider.value = bpm;
+            tempoStat.textContent = bpm + ' BPM';
+            
+            infoBox.innerHTML = `<p style="color: #10B981;">Synced to ${bpm} BPM!</p>`;
+            
+            detectBpmBtn.click();
+            
+            setTimeout(() => {
+                detectedBpmDisplay.classList.remove('visible');
+                confidenceContainer.style.opacity = '0';
+                syncBpmBtn.classList.remove('visible');
+                detectedBpmValue.textContent = '--';
+                if (!isRunning) {
+                    infoBox.innerHTML = '<p>Click play to start metronome</p>';
+                }
+            }, 2000);
+        }
+    }
+});
 
 startButton.addEventListener('click', () => {
+    if (isDetecting) {
+        detectBpmBtn.click();
+    }
+    
     if (!isRunning) {
         initAudioContext();
         
@@ -225,7 +339,7 @@ startButton.addEventListener('click', () => {
         metronomeDisplay.classList.add('active');
         statusStat.textContent = 'Playing';
         statusStat.style.color = '#10B981';
-        infoBox.innerHTML = '<p class="text-green-400">Metronome running</p>';
+        infoBox.innerHTML = '<p style="color: #10B981;">Metronome running</p>';
         
         scheduler();
     } else {
