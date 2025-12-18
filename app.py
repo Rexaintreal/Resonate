@@ -76,6 +76,10 @@ def chords():
     return render_template('chords.html')  
 
 
+@app.route('/spectrum')
+@login_required
+def spectrum():
+    return render_template('spectrum.html')
 
 @app.route('/metronome')
 @login_required

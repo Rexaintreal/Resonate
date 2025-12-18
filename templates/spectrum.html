@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spectrum Analyzer - Resonate</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/visualizer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/spectrum.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        window.FIREBASE_CONFIG = {
+            FIREBASE_API_KEY: "{{ config.FIREBASE_API_KEY }}",
+            FIREBASE_AUTH_DOMAIN: "{{ config.FIREBASE_AUTH_DOMAIN }}",
+            FIREBASE_PROJECT_ID: "{{ config.FIREBASE_PROJECT_ID }}",
+            FIREBASE_STORAGE_BUCKET: "{{ config.FIREBASE_STORAGE_BUCKET }}",
+            FIREBASE_MESSAGING_SENDER_ID: "{{ config.FIREBASE_MESSAGING_SENDER_ID }}",
+            FIREBASE_APP_ID: "{{ config.FIREBASE_APP_ID }}"
+        };
+    </script>
+ </head>
+<body>
+    <div id="logoutModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-overlay">
+        <div class="bg-[#171717] border-2 border-[#262626] rounded-2xl p-8 max-w-md w-full shadow-2xl modal-content">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 bg-[#262626] rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-sign-out-alt text-2xl text-[#737373]"></i>
+                </div>
+                <h3 class="font-['Montserrat'] font-bold text-2xl text-white">Sign Out</h3>
+            </div>
+            <p class="text-[#A3A3A3] mb-6 leading-relaxed font-['Inter']">Are you sure you want to sign out?</p>
+            <div class="flex gap-3">
+                <button id="cancelLogout" class="flex-1 bg-[#262626] hover:bg-[#333333] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter'] border border-[#404040]">Cancel</button>
+                <button id="confirmLogout" class="flex-1 bg-[#14B8A6] hover:bg-[#0F766E] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter']">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="w-full py-4 px-6 md:px-12 border-b border-[#262626]">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-8">
+                <div class="flex items-center gap-3">
+                    <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Resonate" class="h-10 w-10 object-contain">
+                    <span class="font-['Montserrat'] font-bold text-2xl tracking-tight text-white">Resonate</span>
+                </div>
+                <div class="flex gap-6">
+                    <a href="/home" class="nav-link">Visualizer</a>
+                    <a href="/pitch" class="nav-link">Pitch Detection</a>
+                    <a href="/tuner" class="nav-link">Tuner</a>
+                    <a href="/metronome" class="nav-link">Metronome</a>
+                    <a href="/chords" class="nav-link">Chords</a>
+                    <a href="/spectrum" class="nav-link text-[#14B8A6]">Spectrum</a>
+                </div>
+            </div>
+            <div class="logout-icon" id="logoutIcon" title="Sign Out">
+                <i class="fas fa-sign-out-alt text-lg"></i>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1">
+        <div class="spectrum-layout">
+            <div class="spectrum-header">
+                <div>
+                    <h1 class="font-['Montserrat'] font-bold text-2xl text-white">Spectrum Analyzer</h1>
+                    <p class="text-sm text-[#737373] font-['Inter']">Real-time frequency band analysis</p>
+                </div>
+                
+                <div class="controls-wrapper">
+                    <button id="startButton" class="control-btn primary">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="spectrumDisplay" class="spectrum-display-container">
+                <div id="spectrumBands" class="spectrum-bands">
+                </div>
+                
+                <div id="peakFrequency" class="peak-frequency-display">
+                    <div class="peak-label">Peak Frequency</div>
+                    <div class="peak-value" id="peakValue">-- Hz</div>
+                    <div class="peak-note" id="peakNote">--</div>
+                </div>
+            </div>
+
+            <div class="frequency-ranges">
+                <div class="freq-range-card">
+                    <div class="freq-range-name">Sub-Bass</div>
+                    <div class="freq-range-hz">20-60 Hz</div>
+                    <div class="freq-range-bar">
+                        <div id="subBassBar" class="freq-range-fill"></div>
+                    </div>
+                    <div class="freq-range-value" id="subBassValue">0%</div>
+                </div>
+                <div class="freq-range-card">
+                    <div class="freq-range-name">Bass</div>
+                    <div class="freq-range-hz">60-250 Hz</div>
+                    <div class="freq-range-bar">
+                        <div id="bassBar" class="freq-range-fill"></div>
+                    </div>
+                    <div class="freq-range-value" id="bassValue">0%</div>
+                </div>
+                <div class="freq-range-card">
+                    <div class="freq-range-name">Low-Mid</div>
+                    <div class="freq-range-hz">250-500 Hz</div>
+                    <div class="freq-range-bar">
+                        <div id="lowMidBar" class="freq-range-fill"></div>
+                    </div>
+                    <div class="freq-range-value" id="lowMidValue">0%</div>
+                </div>
+                <div class="freq-range-card">
+                    <div class="freq-range-name">Mid</div>
+                    <div class="freq-range-hz">500-2k Hz</div>
+                    <div class="freq-range-bar">
+                        <div id="midBar" class="freq-range-fill"></div>
+                    </div>
+                    <div class="freq-range-value" id="midValue">0%</div>
+                </div>
+                <div class="freq-range-card">
+                    <div class="freq-range-name">High-Mid</div>
+                    <div class="freq-range-hz">2k-4k Hz</div>
+                    <div class="freq-range-bar">
+                        <div id="highMidBar" class="freq-range-fill"></div>
+                    </div>
+                    <div class="freq-range-value" id="highMidValue">0%</div>
+                </div>
+                <div class="freq-range-card">
+                    <div class="freq-range-name">Presence</div>
+                    <div class="freq-range-hz">4k-6k Hz</div>
+                    <div class="freq-range-bar">
+                        <div id="presenceBar" class="freq-range-fill"></div>
+                    </div>
+                    <div class="freq-range-value" id="presenceValue">0%</div>
+                </div>
+                <div class="freq-range-card">
+                    <div class="freq-range-name">Brilliance</div>
+                    <div class="freq-range-hz">6k-20k Hz</div>
+                    <div class="freq-range-bar">
+                        <div id="brillianceBar" class="freq-range-fill"></div>
+                    </div>
+                    <div class="freq-range-value" id="brillianceValue">0%</div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Peak Freq</div>
+                    <div class="stat-value" id="peakStat">-- Hz</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Dominant</div>
+                    <div class="stat-value" id="dominantStat" style="font-size: 14px;">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Energy</div>
+                    <div class="stat-value" id="energyStat">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Status</div>
+                    <div class="stat-value" id="statusStat" style="font-size: 14px;">Idle</div>
+                </div>
+            </div>
+
+            <div class="info-box" id="infoBox">
+                <p>Click microphone to start spectrum analysis</p>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="{{ url_for('static', filename='js/spectrum.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html> 
+
+
