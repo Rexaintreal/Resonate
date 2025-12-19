@@ -168,6 +168,148 @@ export function initHomePage() {
     }
 }
 
+function initKeyboardShortcuts() {
+    const path = window.location.pathname;
+    
+    if (path === '/' || path === '/auth') return;
+
+    const hint = document.createElement('div');
+    hint.className = 'shortcuts-hint';
+    hint.innerHTML = `
+        <div class="shortcuts-hint-icon">?</div>
+        <span>Keyboard shortcuts</span>
+    `;
+    document.body.appendChild(hint);
+
+    const modal = document.createElement('div');
+    modal.className = 'shortcuts-modal';
+    modal.innerHTML = `
+        <div class="shortcuts-modal-content">
+            <div class="shortcuts-modal-header">
+                <h3 class="shortcuts-modal-title">Keyboard Shortcuts</h3>
+                <button class="shortcuts-modal-close">&times;</button>
+            </div>
+            <div class="shortcuts-list">
+                <div class="shortcut-item">
+                    <span class="shortcut-description">Start/Stop</span>
+                    <div class="shortcut-keys">
+                        <kbd class="shortcut-key">Space</kbd>
+                    </div>
+                </div>
+                <div class="shortcut-item">
+                    <span class="shortcut-description">Stop Everything</span>
+                    <div class="shortcut-keys">
+                        <kbd class="shortcut-key">Esc</kbd>
+                    </div>
+                </div>
+                <div class="shortcut-item">
+                    <span class="shortcut-description">Show Shortcuts</span>
+                    <div class="shortcut-keys">
+                        <kbd class="shortcut-key">?</kbd>
+                        <span style="color: #525252;">or</span>
+                        <kbd class="shortcut-key">H</kbd>
+                    </div>
+                </div>
+                <div class="shortcut-item">
+                    <span class="shortcut-description">Navigate: Visualizer</span>
+                    <div class="shortcut-keys">
+                        <kbd class="shortcut-key">1</kbd>
+                    </div>
+                </div>
+                <div class="shortcut-item">
+                    <span class="shortcut-description">Navigate: Pitch</span>
+                    <div class="shortcut-keys">
+                        <kbd class="shortcut-key">2</kbd>
+                    </div>
+                </div>
+                <div class="shortcut-item">
+                    <span class="shortcut-description">Navigate: Tuner</span>
+                    <div class="shortcut-keys">
+                        <kbd class="shortcut-key">3</kbd>
+                    </div>
+                </div>
+                <div class="shortcut-item">
+                    <span class="shortcut-description">Navigate: Metronome</span>
+                    <div class="shortcut-keys">
+                        <kbd class="shortcut-key">4</kbd>
+                    </div>
+                </div>
+                <div class="shortcut-item">
+                    <span class="shortcut-description">Navigate: Chords</span>
+                    <div class="shortcut-keys">
+                        <kbd class="shortcut-key">5</kbd>
+                    </div>
+                </div>
+                <div class="shortcut-item">
+                    <span class="shortcut-description">Navigate: Spectrum</span>
+                    <div class="shortcut-keys">
+                        <kbd class="shortcut-key">6</kbd>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    function toggleModal() {
+        modal.classList.toggle('show');
+    }
+
+    hint.addEventListener('click', toggleModal);
+    modal.querySelector('.shortcuts-modal-close').addEventListener('click', toggleModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) toggleModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        const key = e.key.toLowerCase();
+
+        if (key === '?' || key === 'h') {
+            e.preventDefault();
+            toggleModal();
+            return;
+        }
+
+        if (key === 'escape') {
+            if (modal.classList.contains('show')) {
+                e.preventDefault();
+                toggleModal();
+                return;
+            }
+            const startButton = document.getElementById('startButton');
+            if (startButton && startButton.classList.contains('active')) {
+                startButton.click();
+            }
+            return;
+        }
+
+        if (key === ' ') {
+            e.preventDefault();
+            const startButton = document.getElementById('startButton');
+            if (startButton) {
+                startButton.click();
+            }
+            return;
+        }
+
+        const navMap = {
+            '1': '/home',
+            '2': '/pitch',
+            '3': '/tuner',
+            '4': '/metronome',
+            '5': '/chords',
+            '6': '/spectrum'
+        };
+
+        if (navMap[key]) {
+            e.preventDefault();
+            window.location.href = navMap[key];
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
     
@@ -176,4 +318,5 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (path === '/home' || path === '/tuner') {
         initHomePage();
     }
+    initKeyboardShortcuts();
 });
