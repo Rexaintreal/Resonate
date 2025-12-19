@@ -119,6 +119,38 @@
 .instrument-btn:hover { color: #E5E5E5; }
 .instrument-btn.active { background: #262626; color: #14B8A6; }
 
+.tuning-selector {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    background: #0A0A0A;
+    padding: 6px;
+    border-radius: 10px;
+    border: 1px solid #1F1F1F;
+    width: fit-content;
+    margin: 0 auto;
+    flex-shrink: 0;
+}
+
+.tuning-btn {
+    background: transparent;
+    border: none;
+    color: #525252;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.2s;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tuning-btn:hover { color: #A3A3A3; background: #171717; }
+.tuning-btn.active { background: #171717; color: #14B8A6; border: 1px solid #262626; }
+
 .reference-notes-grid {
     display: flex;
     justify-content: center;
@@ -167,5 +199,6 @@
     .tuner-gauge-container { padding: 12px; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
     .instrument-selector { width: 100%; justify-content: space-between; overflow-x: auto; }
+    .tuning-selector { width: 100%; overflow-x: auto; }
 }
 

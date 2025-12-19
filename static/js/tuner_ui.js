@@ -20,49 +20,113 @@ const centsStat = document.getElementById('centsStat');
 const statusStat = document.getElementById('statusStat');
 const referenceNotesGrid = document.getElementById('referenceNotesGrid');
 const instrumentButtons = document.querySelectorAll('.instrument-btn');
+const tuningButtons = document.querySelectorAll('.tuning-btn');
 
 const audioCapture = new AudioCapture();
 const pitchDetector = new PitchDetector();
 let isRunning = false;
 let detectionInterval = null;
 let currentInstrument = 'chromatic';
+let currentTuning = 'standard';
 
 const instruments = {
-    chromatic: [
-        { name: 'C', freq: 261.63 },
-        { name: 'D', freq: 293.66 },
-        { name: 'E', freq: 329.63 },
-        { name: 'F', freq: 349.23 },
-        { name: 'G', freq: 392.00 },
-        { name: 'A', freq: 440.00 },
-        { name: 'B', freq: 493.88 }
-    ],
-    guitar: [
-        { name: 'E', freq: 82.41, string: '6th' },
-        { name: 'A', freq: 110.00, string: '5th' },
-        { name: 'D', freq: 146.83, string: '4th' },
-        { name: 'G', freq: 196.00, string: '3rd' },
-        { name: 'B', freq: 246.94, string: '2nd' },
-        { name: 'E', freq: 329.63, string: '1st' }
-    ],
-    bass: [
-        { name: 'E', freq: 41.20, string: '4th' },
-        { name: 'A', freq: 55.00, string: '3rd' },
-        { name: 'D', freq: 73.42, string: '2nd' },
-        { name: 'G', freq: 98.00, string: '1st' }
-    ],
-    ukulele: [
-        { name: 'G', freq: 392.00, string: '4th' },
-        { name: 'C', freq: 261.63, string: '3rd' },
-        { name: 'E', freq: 329.63, string: '2nd' },
-        { name: 'A', freq: 440.00, string: '1st' }
-    ],
-    violin: [
-        { name: 'G', freq: 196.00, string: '4th' },
-        { name: 'D', freq: 293.66, string: '3rd' },
-        { name: 'A', freq: 440.00, string: '2nd' },
-        { name: 'E', freq: 659.25, string: '1st' }
-    ]
+    chromatic: {
+        standard: [
+            { name: 'C', freq: 261.63 },
+            { name: 'D', freq: 293.66 },
+            { name: 'E', freq: 329.63 },
+            { name: 'F', freq: 349.23 },
+            { name: 'G', freq: 392.00 },
+            { name: 'A', freq: 440.00 },
+            { name: 'B', freq: 493.88 }
+        ]
+    },
+    guitar: {
+        standard: [
+            { name: 'E', freq: 82.41, string: '6th' },
+            { name: 'A', freq: 110.00, string: '5th' },
+            { name: 'D', freq: 146.83, string: '4th' },
+            { name: 'G', freq: 196.00, string: '3rd' },
+            { name: 'B', freq: 246.94, string: '2nd' },
+            { name: 'E', freq: 329.63, string: '1st' }
+        ],
+        dropD: [
+            { name: 'D', freq: 73.42, string: '6th' },
+            { name: 'A', freq: 110.00, string: '5th' },
+            { name: 'D', freq: 146.83, string: '4th' },
+            { name: 'G', freq: 196.00, string: '3rd' },
+            { name: 'B', freq: 246.94, string: '2nd' },
+            { name: 'E', freq: 329.63, string: '1st' }
+        ],
+        openG: [
+            { name: 'D', freq: 73.42, string: '6th' },
+            { name: 'G', freq: 98.00, string: '5th' },
+            { name: 'D', freq: 146.83, string: '4th' },
+            { name: 'G', freq: 196.00, string: '3rd' },
+            { name: 'B', freq: 246.94, string: '2nd' },
+            { name: 'D', freq: 293.66, string: '1st' }
+        ],
+        dadgad: [
+            { name: 'D', freq: 73.42, string: '6th' },
+            { name: 'A', freq: 110.00, string: '5th' },
+            { name: 'D', freq: 146.83, string: '4th' },
+            { name: 'G', freq: 196.00, string: '3rd' },
+            { name: 'A', freq: 220.00, string: '2nd' },
+            { name: 'D', freq: 293.66, string: '1st' }
+        ],
+        openD: [
+            { name: 'D', freq: 73.42, string: '6th' },
+            { name: 'A', freq: 110.00, string: '5th' },
+            { name: 'D', freq: 146.83, string: '4th' },
+            { name: 'F#', freq: 185.00, string: '3rd' },
+            { name: 'A', freq: 220.00, string: '2nd' },
+            { name: 'D', freq: 293.66, string: '1st' }
+        ],
+        openE: [
+            { name: 'E', freq: 82.41, string: '6th' },
+            { name: 'B', freq: 123.47, string: '5th' },
+            { name: 'E', freq: 164.81, string: '4th' },
+            { name: 'G#', freq: 207.65, string: '3rd' },
+            { name: 'B', freq: 246.94, string: '2nd' },
+            { name: 'E', freq: 329.63, string: '1st' }
+        ]
+    },
+    bass: {
+        standard: [
+            { name: 'E', freq: 41.20, string: '4th' },
+            { name: 'A', freq: 55.00, string: '3rd' },
+            { name: 'D', freq: 73.42, string: '2nd' },
+            { name: 'G', freq: 98.00, string: '1st' }
+        ],
+        dropD: [
+            { name: 'D', freq: 36.71, string: '4th' },
+            { name: 'A', freq: 55.00, string: '3rd' },
+            { name: 'D', freq: 73.42, string: '2nd' },
+            { name: 'G', freq: 98.00, string: '1st' }
+        ]
+    },
+    ukulele: {
+        standard: [
+            { name: 'G', freq: 392.00, string: '4th' },
+            { name: 'C', freq: 261.63, string: '3rd' },
+            { name: 'E', freq: 329.63, string: '2nd' },
+            { name: 'A', freq: 440.00, string: '1st' }
+        ],
+        baritone: [
+            { name: 'D', freq: 146.83, string: '4th' },
+            { name: 'G', freq: 196.00, string: '3rd' },
+            { name: 'B', freq: 246.94, string: '2nd' },
+            { name: 'E', freq: 329.63, string: '1st' }
+        ]
+    },
+    violin: {
+        standard: [
+            { name: 'G', freq: 196.00, string: '4th' },
+            { name: 'D', freq: 293.66, string: '3rd' },
+            { name: 'A', freq: 440.00, string: '2nd' },
+            { name: 'E', freq: 659.25, string: '1st' }
+        ]
+    }
 };
 
 
@@ -96,9 +160,37 @@ logoutModal.addEventListener('click', (e) => {
     }
 });
 
+function updateTuningSelector() {
+    const tuningSelector = document.querySelector('.tuning-selector');
+    const availableTunings = Object.keys(instruments[currentInstrument]);
+    
+    if (availableTunings.length > 1) {
+        tuningSelector.style.display = 'flex';
+        const tuningButtons = tuningSelector.querySelectorAll('.tuning-btn');
+        
+        tuningButtons.forEach(btn => {
+            const tuningName = btn.dataset.tuning;
+            if (availableTunings.includes(tuningName)) {
+                btn.style.display = 'block';
+                if (tuningName === currentTuning) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            } else {
+                btn.style.display = 'none';
+            }
+        });
+    } else {
+        tuningSelector.style.display = 'none';
+        currentTuning = 'standard';
+    }
+    
+    updateReferenceNotes();
+}
 
 function updateReferenceNotes() {
-    const notes = instruments[currentInstrument];
+    const notes = instruments[currentInstrument][currentTuning];
     referenceNotesGrid.innerHTML = notes.map(note => `
         <div class="reference-note" data-freq="${note.freq}">
             <div class="reference-note-name">${note.name}${note.string ? '<sub style="font-size:10px">' + note.string + '</sub>' : ''}</div>
@@ -149,6 +241,16 @@ instrumentButtons.forEach(btn => {
         instrumentButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentInstrument = btn.dataset.instrument;
+        currentTuning = 'standard';
+        updateTuningSelector();
+    });
+});
+
+tuningButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        tuningButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTuning = btn.dataset.tuning;
         updateReferenceNotes();
     });
 });
@@ -265,4 +367,4 @@ startButton.addEventListener('click', async () => {
     }
 });
 
-updateReferenceNotes();
+updateTuningSelector();
