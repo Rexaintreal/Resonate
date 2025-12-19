@@ -38,25 +38,42 @@
             </div>
         </div>
     </div>
-    <nav class="w-full py-4 px-6 md:px-12 border-b border-[#262626]">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-8">
-                <div class="flex items-center gap-3">
-                    <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Resonate" class="h-10 w-10 object-contain">
-                    <span class="font-['Montserrat'] font-bold text-2xl tracking-tight text-white">Resonate</span>
-                </div>
-                <div class="flex gap-6">
-                    <a href="/home" class="nav-link">Visualizer</a>
-                    <a href="/pitch" class="nav-link">Pitch Detection</a>
-                    <a href="/tuner" class="nav-link">Tuner</a>
-                    <a href="/metronome" class="nav-link">Metronome</a>
-                    <a href="/chords" class="nav-link text-[#14B8A6]">Chords</a>
-                    <a href="/spectrum" class="nav-link">Spectrum</a>
-                </div>
+    <nav class="w-full py-4 px-6 md:px-12 border-b border-[#262626] bg-[#0A0A0A] sticky top-0 z-50">
+        <div class="flex justify-between items-center w-full">
+            <div class="flex items-center gap-3">
+                <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Resonate" class="h-10 w-10 object-contain">
+                <span class="font-['Montserrat'] font-bold text-2xl tracking-tight text-white hidden sm:block">Resonate</span>
             </div>
-            <div class="logout-icon" id="logoutIcon" title="Sign Out">
-                <i class="fas fa-sign-out-alt text-lg"></i>
+
+            <div class="flex items-center gap-4 md:gap-8">
+                <div class="hidden lg:flex items-center gap-6">
+                    <a href="/home" class="text-sm font-medium text-[#737373] hover:text-white transition-colors">Visualizer</a>
+                    <a href="/pitch" class="text-sm font-medium text-[#737373] hover:text-white transition-colors">Pitch</a>
+                    <a href="/tuner" class="text-sm font-medium text-[#737373] hover:text-white transition-colors">Tuner</a>
+                    <a href="/metronome" class="text-sm font-medium text-[#737373] hover:text-white transition-colors">Metronome</a>
+                    <a href="/chords" class="text-sm font-medium text-[#737373] hover:text-white transition-colors">Chords</a>
+                    <a href="/spectrum" class="text-sm font-medium text-[#737373] hover:text-white transition-colors">Spectrum</a>
+                </div>
+
+                <div class="flex items-center border-l border-[#262626] ml-2 pl-6">
+                    <div class="logout-icon cursor-pointer text-[#737373] hover:text-red-400 transition-colors" id="logoutIcon">
+                        <i class="fas fa-sign-out-alt text-lg"></i>
+                    </div>
+                </div>
+
+                <button class="lg:hidden text-white" onclick="document.getElementById('mobile-nav').classList.toggle('hidden')">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
             </div>
+        </div>
+
+        <div id="mobile-nav" class="hidden lg:hidden mt-4 space-y-4 pb-4 transition-all">
+            <a href="/home" class="block text-[#737373] hover:text-white">Visualizer</a>
+            <a href="/pitch" class="block text-[#737373] hover:text-white">Pitch</a>
+            <a href="/tuner" class="block text-[#737373] hover:text-white">Tuner</a>
+            <a href="/metronome" class="block text-[#737373] hover:text-white">Metronome</a>
+            <a href="/chords" class="block text-[#737373] hover:text-white">Chords</a>
+            <a href="/spectrum" class="block text-[#737373] hover:text-white">Spectrum</a>
         </div>
     </nav>
     <main class="flex-1">
