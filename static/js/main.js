@@ -15,6 +15,82 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
+// toast noti sys
+class ToastManager {
+    constructor() {
+        this.container = null;
+        this.init();
+    }
+
+    init() {
+        if (!this.container) {
+            this.container = document.createElement('div');
+            this.container.className = 'toast-container';
+            document.body.appendChild(this.container);
+        }
+    }
+
+    show(title, message = '', type = 'info', duration = 3000) {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+
+        const icons = {
+            success: '✓',
+            error: '✕',
+            warning: '⚠',
+            info: 'i'
+        };
+
+        toast.innerHTML = `
+            <div class="toast-icon">${icons[type] || 'i'}</div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                ${message ? `<div class="toast-message">${message}</div>` : ''}
+            </div>
+            <button class="toast-close">&times;</button>
+            <div class="toast-progress"></div>
+        `;
+
+        this.container.appendChild(toast);
+
+        const closeBtn = toast.querySelector('.toast-close');
+        const remove = () => {
+            toast.classList.add('removing');
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    this.container.removeChild(toast);
+                }
+            }, 300);
+        };
+
+        closeBtn.addEventListener('click', remove);
+
+        if (duration > 0) {
+            setTimeout(remove, duration);
+        }
+
+        return toast;
+    }
+
+    success(title, message = '', duration = 3000) {
+        return this.show(title, message, 'success', duration);
+    }
+
+    error(title, message = '', duration = 4000) {
+        return this.show(title, message, 'error', duration);
+    }
+
+    warning(title, message = '', duration = 3500) {
+        return this.show(title, message, 'warning', duration);
+    }
+
+    info(title, message = '', duration = 3000) {
+        return this.show(title, message, 'info', duration);
+    }
+}
+
+window.toast = new ToastManager();
+
 function showErrorModal(message) {
     const modal = document.getElementById('errorModal');
     const messageEl = document.getElementById('errorMessage');
@@ -107,6 +183,7 @@ export function initAuthPage() {
 
                 if (response.ok && data.success) {
                     showSuccessModal();
+                    window.toast.success('Signed in successfully!', `Welcome back, ${user.displayName}`);
                     setTimeout(() => {
                         window.location.href = '/home';
                     }, 1000);
@@ -134,6 +211,7 @@ export function initAuthPage() {
                 }
 
                 showErrorModal(errorMessage);
+                window.toast.error('Sign in failed', errorMessage);
             }
         });
     }
@@ -159,10 +237,14 @@ export function initHomePage() {
             try {
                 await signOut(auth);
                 await fetch('/api/logout', { method: 'POST' });
-                window.location.href = '/';
+                window.toast.success('Signed out successfully', 'See you next time!');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1000);
             } catch (error) {
                 console.error('Error signing out:', error);
                 showErrorModal('Failed to sign out. Please try again.');
+                window.toast.error('Sign out failed', 'Please try again');
             }
         });
     }
@@ -281,6 +363,7 @@ function initKeyboardShortcuts() {
             const startButton = document.getElementById('startButton');
             if (startButton && startButton.classList.contains('active')) {
                 startButton.click();
+                window.toast.info('Stopped', 'Audio capture stopped');
             }
             return;
         }
@@ -289,7 +372,23 @@ function initKeyboardShortcuts() {
             e.preventDefault();
             const startButton = document.getElementById('startButton');
             if (startButton) {
+                const isActive = startButton.classList.contains('active');
                 startButton.click();
+                
+                const pageName = {
+                    '/home': 'Visualizer',
+                    '/pitch': 'Pitch Detection',
+                    '/tuner': 'Tuner',
+                    '/metronome': 'Metronome',
+                    '/chords': 'Chord Detection',
+                    '/spectrum': 'Spectrum Analyzer'
+                }[path] || 'Audio';
+                
+                if (!isActive) {
+                    window.toast.success(`${pageName} started`, 'Listening to audio input');
+                } else {
+                    window.toast.info(`${pageName} stopped`, 'Audio capture stopped');
+                }
             }
             return;
         }
@@ -305,7 +404,18 @@ function initKeyboardShortcuts() {
 
         if (navMap[key]) {
             e.preventDefault();
-            window.location.href = navMap[key];
+            const pageName = {
+                '/home': 'Visualizer',
+                '/pitch': 'Pitch Detection',
+                '/tuner': 'Tuner',
+                '/metronome': 'Metronome',
+                '/chords': 'Chord Detection',
+                '/spectrum': 'Spectrum Analyzer'
+            }[navMap[key]];
+            window.toast.info('Navigating', `Switching to ${pageName}`);
+            setTimeout(() => {
+                window.location.href = navMap[key];
+            }, 300);
         }
     });
 }
