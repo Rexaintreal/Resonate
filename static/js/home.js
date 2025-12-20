@@ -97,6 +97,7 @@ confirmDelete.addEventListener('click', async () => {
             const data = await response.json();
             if (data.success) {
                 await loadRecordings();
+                window.toast.success('Recording deleted', 'Successfully removed from library');
                 infoBox.innerHTML = '<p class="text-green-400">Recording deleted successfully</p>';
                 setTimeout(() => {
                     if (!isRunning) {
@@ -106,10 +107,12 @@ confirmDelete.addEventListener('click', async () => {
                     }
                 }, 2000);
             } else {
+                window.toast.error('Delete failed', 'Could not delete recording');
                 infoBox.innerHTML = '<p class="text-red-400">Failed to delete recording</p>';
             }
         } catch (error) {
             console.error('Error deleting recording:', error);
+            window.toast.error('Delete failed', 'An error occurred');
             infoBox.innerHTML = '<p class="text-red-400">Failed to delete recording</p>';
         }
     }
@@ -153,9 +156,12 @@ document.querySelectorAll('.format-btn').forEach(btn => {
                     const blob = await converter.convert(pendingDownloadUrl, format);
                     if (blob) {
                         downloadUrl = URL.createObjectURL(blob);
+                        window.toast.success('Conversion complete', `Ready to download as ${format.toUpperCase()}`);
                     } else {
                         throw new Error("Conversion returned null");
                     }
+                } else {
+                    window.toast.info('Download started', 'Downloading original file');
                 }
 
                 const a = document.createElement('a');
@@ -171,7 +177,7 @@ document.querySelectorAll('.format-btn').forEach(btn => {
 
             } catch (error) {
                 console.error('Conversion failed:', error);
-                alert('Failed to convert audio format. Please try again.');
+                window.toast.error('Download failed', 'Could not convert audio format');
             }
         }
         formatModal.classList.add('hidden');
@@ -352,6 +358,7 @@ function updateRecordingsList(recordings) {
                 console.error('Playback error:', err);
                 stopCurrentAudio();
                 visualizer.stop();
+                window.toast.error('Playback failed', 'Could not play recording');
                 infoBox.innerHTML = '<p class="text-red-400">Failed to play recording</p>';
             }
         });
@@ -377,6 +384,7 @@ function updateRecordingsList(recordings) {
 
 async function uploadRecording(blob) {
     if (blob.size === 0) {
+        window.toast.error('Recording too short', 'No audio data captured');
         infoBox.innerHTML = '<p class="text-red-400">Recording failed - no audio data</p>';
         return;
     }
@@ -394,6 +402,7 @@ async function uploadRecording(blob) {
         
         const data = await response.json();
         if (data.success) {
+        window.toast.success('Recording saved', 'Added to your library');
         infoBox.innerHTML = '<p class="text-green-400">Recording saved successfully</p>';
         await loadRecordings();
         timerDisplay.textContent = '00:00';
@@ -401,10 +410,12 @@ async function uploadRecording(blob) {
             infoBox.innerHTML = '<p class="text-green-400">Microphone active</p>';
         }, 3000);
         } else {
+            window.toast.error('Save failed', data.error || 'Could not save recording');
             infoBox.innerHTML = `<p class="text-red-400">Upload failed: ${data.error}</p>`;
         }
     } catch (error) {
         console.error('Error uploading recording:', error);
+        window.toast.error('Upload failed', 'Could not save recording');
         infoBox.innerHTML = '<p class="text-red-400">Failed to save recording</p>';
     }
 }
@@ -483,10 +494,13 @@ startButton.addEventListener('click', async () => {
             startButton.classList.remove('active');
             startButton.disabled = false;
             if (error.message.includes('denied')) {
+                window.toast.error('Microphone denied', 'Please allow access in browser settings');
                 infoBox.innerHTML = `<p class="text-red-400">Microphone access denied. Please allow access in browser settings.</p>`;
             } else if (error.message.includes('not found')) {
+                window.toast.error('No microphone found', 'Please connect a microphone');
                 infoBox.innerHTML = `<p class="text-red-400">No microphone found. Please connect a microphone.</p>`;
             } else {
+                window.toast.error('Microphone error', error.message);
                 infoBox.innerHTML = `<p class="text-red-400">${error.message}</p>`;
             }
         }
@@ -548,6 +562,7 @@ recordButton.addEventListener('click', async () => {
             isRecording = true;
             recordButton.classList.add('active');
             recordingTimer.style.display = 'block';
+            window.toast.info('Recording started', 'Capturing audio...');
             
             timerInterval = setInterval(() => {
                 const duration = recorder.getRecordingDuration();
@@ -557,6 +572,7 @@ recordButton.addEventListener('click', async () => {
                     `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             }, 1000);
         } else {
+            window.toast.error('Recording failed', 'Could not start recording');
             infoBox.innerHTML = '<p class="text-red-400">Failed to start recording</p>';
         }
     } else {
@@ -571,8 +587,10 @@ recordButton.addEventListener('click', async () => {
         }
         
         if (blob && blob.size > 0) {
+            window.toast.success('Recording stopped', 'Saving to library...');
             await uploadRecording(blob);
         } else {
+            window.toast.error('Recording failed', 'No audio data captured');
             infoBox.innerHTML = '<p class="text-red-400">Recording failed - no data</p>';
         }
     }
