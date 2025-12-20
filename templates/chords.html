@@ -7,10 +7,11 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/visualizer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chords.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/skeleton.css') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/chords.css') }}">
     <script>
         window.FIREBASE_CONFIG = {
             FIREBASE_API_KEY: "{{ config.FIREBASE_API_KEY }}",
@@ -78,6 +79,77 @@
     </nav>
     <main class="flex-1">
         <div class="chord-layout">
+            <div id="chordSkeleton" class="skeleton-container">
+                <div class="skeleton-chord-layout">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="skeleton-header">
+                            <div class="skeleton-title">
+                                <div class="skeleton skeleton-title-main"></div>
+                                <div class="skeleton skeleton-title-sub"></div>
+                            </div>
+                            <div class="skeleton-controls">
+                                <div class="skeleton skeleton-control-btn"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-display" style="flex: 1;">
+                            <div class="skeleton skeleton-display-main"></div>
+                            <div class="skeleton skeleton-display-sub"></div>
+                            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                                <div class="skeleton" style="width: 60px; height: 48px; border-radius: 12px;"></div>
+                                <div class="skeleton" style="width: 60px; height: 48px; border-radius: 12px;"></div>
+                                <div class="skeleton" style="width: 60px; height: 48px; border-radius: 12px;"></div>
+                            </div>
+                            <div class="skeleton skeleton-display-mini" style="margin-top: 20px;"></div>
+                        </div>
+                        <div class="skeleton-stats" style="grid-template-columns: repeat(4, 1fr);">
+                            <div class="skeleton-stat-card">
+                                <div class="skeleton skeleton-stat-label"></div>
+                                <div class="skeleton skeleton-stat-value"></div>
+                            </div>
+                            <div class="skeleton-stat-card">
+                                <div class="skeleton skeleton-stat-label"></div>
+                                <div class="skeleton skeleton-stat-value"></div>
+                            </div>
+                            <div class="skeleton-stat-card">
+                                <div class="skeleton skeleton-stat-label"></div>
+                                <div class="skeleton skeleton-stat-value"></div>
+                            </div>
+                            <div class="skeleton-stat-card">
+                                <div class="skeleton skeleton-stat-label"></div>
+                                <div class="skeleton skeleton-stat-value"></div>
+                            </div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="skeleton" style="width: 250px; height: 16px; margin: 0 auto;"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div style="background: #111111; border: 1px solid #262626; border-radius: 16px; padding: 20px;">
+                            <div class="skeleton" style="width: 100px; height: 16px; margin-bottom: 12px;"></div>
+                            <div class="skeleton-note-wheel">
+                                <div class="skeleton skeleton-wheel-note"></div>
+                                <div class="skeleton skeleton-wheel-note"></div>
+                                <div class="skeleton skeleton-wheel-note"></div>
+                                <div class="skeleton skeleton-wheel-note"></div>
+                                <div class="skeleton skeleton-wheel-note"></div>
+                                <div class="skeleton skeleton-wheel-note"></div>
+                                <div class="skeleton skeleton-wheel-note"></div>
+                                <div class="skeleton skeleton-wheel-note"></div>
+                                <div class="skeleton skeleton-wheel-note"></div>
+                                <div class="skeleton skeleton-wheel-note"></div>
+                                <div class="skeleton skeleton-wheel-note"></div>
+                                <div class="skeleton skeleton-wheel-note"></div>
+                            </div>
+                        </div>
+                        <div style="background: #111111; border: 1px solid #262626; border-radius: 16px; padding: 20px;">
+                            <div class="skeleton" style="width: 120px; height: 16px; margin-bottom: 12px;"></div>
+                            <div class="skeleton skeleton-history-item"></div>
+                            <div class="skeleton skeleton-history-item"></div>
+                            <div class="skeleton skeleton-history-item"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="chord-main-section">
                 <div class="chord-header">
                     <div>
@@ -155,6 +227,18 @@
             </div>
         </div>
     </main>
+
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const skeleton = document.getElementById('chordSkeleton');
+                if (skeleton) {
+                    skeleton.classList.add('hidden');
+                }
+            }, 500);
+        });
+    </script>
+
     <script type="module" src="{{ url_for('static', filename='js/chords.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
  </body>

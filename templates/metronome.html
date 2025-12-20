@@ -7,10 +7,11 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/visualizer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/metronome.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/skeleton.css') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/metronome.css') }}">
     <script>
         window.FIREBASE_CONFIG = {
             FIREBASE_API_KEY: "{{ config.FIREBASE_API_KEY }}",
@@ -80,6 +81,70 @@
 
     <main class="flex-1">
         <div class="metronome-layout">
+            <div id="metronomeSkeleton" class="skeleton-container">
+                <div style="display: flex; flex-direction: column; gap: 16px; height: 100%; padding: 20px;">
+                    <div class="skeleton-header" style="grid-column: 1 / -1;">
+                        <div class="skeleton-title">
+                            <div class="skeleton skeleton-title-main"></div>
+                            <div class="skeleton skeleton-title-sub"></div>
+                        </div>
+                        <div class="skeleton-controls">
+                            <div class="skeleton skeleton-control-btn"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-mode-selector" style="margin: 0 auto;">
+                        <div class="skeleton skeleton-mode-btn" style="width: 60px;"></div>
+                        <div class="skeleton skeleton-mode-btn" style="width: 60px;"></div>
+                        <div class="skeleton skeleton-mode-btn" style="width: 60px;"></div>
+                        <div class="skeleton skeleton-mode-btn" style="width: 60px;"></div>
+                        <div class="skeleton skeleton-mode-btn" style="width: 60px;"></div>
+                    </div>
+                    <div style="flex: 1; background: #111111; border: 1px solid #262626; border-radius: 16px; padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; justify-content: center;">
+                            <div class="skeleton skeleton-bpm"></div>
+                            <div class="skeleton" style="width: 80px; height: 20px;"></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 16px; justify-content: center;">
+                            <div class="skeleton-beat-dots">
+                                <div class="skeleton skeleton-beat-dot"></div>
+                                <div class="skeleton skeleton-beat-dot"></div>
+                                <div class="skeleton skeleton-beat-dot"></div>
+                                <div class="skeleton skeleton-beat-dot"></div>
+                            </div>
+                            <div class="skeleton skeleton-slider"></div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                                <div class="skeleton" style="width: 30px; height: 12px;"></div>
+                                <div class="skeleton" style="width: 50px; height: 12px;"></div>
+                                <div class="skeleton" style="width: 50px; height: 12px;"></div>
+                                <div class="skeleton" style="width: 40px; height: 12px;"></div>
+                                <div class="skeleton" style="width: 30px; height: 12px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skeleton-stats">
+                        <div class="skeleton-stat-card">
+                            <div class="skeleton skeleton-stat-label"></div>
+                            <div class="skeleton skeleton-stat-value"></div>
+                        </div>
+                        <div class="skeleton-stat-card">
+                            <div class="skeleton skeleton-stat-label"></div>
+                            <div class="skeleton skeleton-stat-value"></div>
+                        </div>
+                        <div class="skeleton-stat-card">
+                            <div class="skeleton skeleton-stat-label"></div>
+                            <div class="skeleton skeleton-stat-value"></div>
+                        </div>
+                        <div class="skeleton-stat-card">
+                            <div class="skeleton skeleton-stat-label"></div>
+                            <div class="skeleton skeleton-stat-value"></div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <div class="skeleton" style="width: 200px; height: 16px; margin: 0 auto;"></div>
+                    </div>
+                </div>
+            </div>
             <div class="metronome-header">
                 <div>
                     <h1 class="font-['Montserrat'] font-bold text-2xl text-white">Metronome</h1>
@@ -176,6 +241,18 @@
             </div>
         </div>
     </main>
+
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const skeleton = document.getElementById('metronomeSkeleton');
+                if (skeleton) {
+                    skeleton.classList.add('hidden');
+                }
+            }, 500);
+        });
+    </script>
+
     <script type="module" src="{{ url_for('static', filename='js/metronome.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
  </body>

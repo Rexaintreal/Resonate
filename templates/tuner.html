@@ -7,10 +7,11 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/visualizer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tuner.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/skeleton.css') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tuner.css') }}">
     <script>
         window.FIREBASE_CONFIG = {
             FIREBASE_API_KEY: "{{ config.FIREBASE_API_KEY }}",
@@ -80,6 +81,76 @@
 
     <main class="flex-1">
         <div class="tuner-layout">
+            <div id="tunerSkeleton" class="skeleton-container">
+                <div style="display: flex; flex-direction: column; gap: 16px; height: 100%; padding: 20px;">
+                    <div class="skeleton-header">
+                        <div class="skeleton-title">
+                            <div class="skeleton skeleton-title-main"></div>
+                            <div class="skeleton skeleton-title-sub"></div>
+                        </div>
+                        <div class="skeleton-controls">
+                            <div class="skeleton skeleton-control-btn"></div>
+                        </div>
+                    </div>
+
+                    <div class="skeleton-mode-selector" style="margin: 0 auto;">
+                        <div class="skeleton skeleton-mode-btn"></div>
+                        <div class="skeleton skeleton-mode-btn"></div>
+                        <div class="skeleton skeleton-mode-btn"></div>
+                        <div class="skeleton skeleton-mode-btn"></div>
+                        <div class="skeleton skeleton-mode-btn"></div>
+                    </div>
+
+                    <div class="skeleton-mode-selector" style="margin: 0 auto; width: 80%;">
+                        <div class="skeleton skeleton-mode-btn" style="width: 60px;"></div>
+                        <div class="skeleton skeleton-mode-btn" style="width: 60px;"></div>
+                        <div class="skeleton skeleton-mode-btn" style="width: 60px;"></div>
+                        <div class="skeleton skeleton-mode-btn" style="width: 60px;"></div>
+                        <div class="skeleton skeleton-mode-btn" style="width: 60px;"></div>
+                    </div>
+
+                    <div class="skeleton-display" style="flex: 1;">
+                        <div class="skeleton skeleton-display-main"></div>
+                        <div class="skeleton skeleton-display-sub"></div>
+                        <div class="skeleton skeleton-gauge"></div>
+                        <div class="skeleton skeleton-display-mini"></div>
+                        <div class="skeleton" style="width: 150px; height: 16px; border-radius: 6px; margin-top: 8px;"></div>
+                    </div>
+
+                    <div class="skeleton-reference-notes">
+                        <div class="skeleton skeleton-reference-note"></div>
+                        <div class="skeleton skeleton-reference-note"></div>
+                        <div class="skeleton skeleton-reference-note"></div>
+                        <div class="skeleton skeleton-reference-note"></div>
+                        <div class="skeleton skeleton-reference-note"></div>
+                        <div class="skeleton skeleton-reference-note"></div>
+                    </div>
+
+                    <div class="skeleton-stats">
+                        <div class="skeleton-stat-card">
+                            <div class="skeleton skeleton-stat-label"></div>
+                            <div class="skeleton skeleton-stat-value"></div>
+                        </div>
+                        <div class="skeleton-stat-card">
+                            <div class="skeleton skeleton-stat-label"></div>
+                            <div class="skeleton skeleton-stat-value"></div>
+                        </div>
+                        <div class="skeleton-stat-card">
+                            <div class="skeleton skeleton-stat-label"></div>
+                            <div class="skeleton skeleton-stat-value"></div>
+                        </div>
+                        <div class="skeleton-stat-card">
+                            <div class="skeleton skeleton-stat-label"></div>
+                            <div class="skeleton skeleton-stat-value"></div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <div class="skeleton" style="width: 200px; height: 16px; margin: 0 auto;"></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="tuner-header">
                 <div>
                     <h1 class="font-['Montserrat'] font-bold text-2xl text-white">Instrument Tuner</h1>
@@ -178,6 +249,17 @@
             </div>
         </div>
     </main>
+
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const skeleton = document.getElementById('tunerSkeleton');
+                if (skeleton) {
+                    skeleton.classList.add('hidden');
+                }
+            }, 500);
+        });
+    </script>
 
     <script type="module" src="{{ url_for('static', filename='js/tuner_ui.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
