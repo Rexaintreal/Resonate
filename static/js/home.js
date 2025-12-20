@@ -3,6 +3,7 @@ import { Visualizer } from './visualizer.js';
 import { Settings } from './settings.js';
 import { AudioRecorder } from './recorder.js';
 import { AudioConverter } from './converter.js';
+import { PracticeTracker } from './practice_tracker.js';
 
 /* console.log('Home app initializing...'); */
 
@@ -10,6 +11,7 @@ window.settingsManager = new Settings();
 const visualizer = new Visualizer();
 const recorder = new AudioRecorder();
 const converter = new AudioConverter();
+const practiceTracker = new PracticeTracker();
 
 let isRunning = false;
 let isRecording = false;
@@ -402,8 +404,29 @@ async function uploadRecording(blob) {
             infoBox.innerHTML = `<p class="text-red-400">Upload failed: ${data.error}</p>`;
         }
     } catch (error) {
-        console.error('Error uploading recording:', error); // debug remove in prod 
+        console.error('Error uploading recording:', error);
         infoBox.innerHTML = '<p class="text-red-400">Failed to save recording</p>';
+    }
+}
+// update stats display
+function updatePracticeDisplay() {
+    const todayStats = practiceTracker.getTodayStats();
+    const weekStats = practiceTracker.getWeekStats();
+    
+    const todayEl = document.getElementById('todayPractice');
+    const weekEl = document.getElementById('weekPractice');
+    
+    if (todayEl) {
+        todayEl.textContent = practiceTracker.formatMinutes(todayStats.minutes);
+    }
+    
+    if (weekEl) {
+        weekEl.textContent = practiceTracker.formatMinutes(weekStats.minutes);
+    }
+    
+    //update again eveyr 60s if sesison is active
+    if (practiceTracker.isActive()) {
+        setTimeout(updatePracticeDisplay, 60000);
     }
 }
 
@@ -434,6 +457,10 @@ startButton.addEventListener('click', async () => {
             recordButton.disabled = false;
             startButton.disabled = false;
             infoBox.innerHTML = '<p class="text-green-400">Microphone active</p>';
+            
+            // start track session
+            practiceTracker.startSession('visualizer');
+            updatePracticeDisplay();
 
             statsInterval = setInterval(() => {
                 const stats = visualizer.getStats();
@@ -465,6 +492,15 @@ startButton.addEventListener('click', async () => {
         }
     } else {
         isRunning = false;
+        
+        //end session
+        const session = practiceTracker.endSession();
+        if (session) {
+            const duration = practiceTracker.formatMinutes(Math.floor(session.duration / 60));
+            window.toast.success('Session saved', `Practiced for ${duration}`);
+            updatePracticeDisplay();
+        }
+        
         if (statsInterval) {
             clearInterval(statsInterval);
             statsInterval = null;
@@ -502,7 +538,7 @@ startButton.addEventListener('click', async () => {
 
 recordButton.addEventListener('click', async () => {
     if (!isRecording) {
-    // Prevent recording if microphone isn't active
+    //check mic is running or not
         if (!isRunning) {
             window.toast.warning('Start microphone first', 'Click the microphone button to begin');
             return;
@@ -543,3 +579,4 @@ recordButton.addEventListener('click', async () => {
 });
 
 loadRecordings();
+updatePracticeDisplay();
