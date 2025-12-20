@@ -4,29 +4,33 @@ export class AudioCapture {
         this.analyser = null;
         this.microphone = null;
         this.dataArray = null;
-        this.bufferLength = 0;
+        this.bufferLen = 0;
         this.isActive = false;
     }
 
     async initialize() {
         try {
+            //REQUEST Microphone
+            // no noise supression for better fft results
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: {
                     echoCancellation: false,
-                    noiseSuppression: false,
-                    autoGainControl: false
+                    noiseSuppression: false,  //raw audio
+                    autoGainControl: false    //no automatic volume adjustment
                 } 
             });
 
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             this.analyser = this.audioContext.createAnalyser();
-            this.analyser.fftSize = 2048;
-            this.analyser.smoothingTimeConstant = 0.8;
+            this.analyser.fftSize = 2048;  //DEFAULT (change in settings)
+            this.analyser.smoothingTimeConstant = 0.8; //smothing
             this.microphone = this.audioContext.createMediaStreamSource(stream);
             this.microphone.connect(this.analyser);
-            this.bufferLength = this.analyser.frequencyBinCount;
-            this.dataArray = new Uint8Array(this.bufferLength);
+            
+            this.bufferLen = this.analyser.frequencyBinCount;
+            this.dataArray = new Uint8Array(this.bufferLen);
             this.isActive = true;
+            
             return true;
         } catch (error) {
             console.error('Error accessing microphone:', error);
@@ -44,6 +48,7 @@ export class AudioCapture {
         if (!this.isActive || !this.analyser) {
             return null;
         }
+        //data array update
         this.analyser.getByteFrequencyData(this.dataArray);
         return this.dataArray;
     }
@@ -52,7 +57,7 @@ export class AudioCapture {
         if (!this.isActive || !this.analyser) {
             return null;
         }
-        this.analyser.getByteTimeDomainData(this.dataArray);
+        this.analyser.getByteTimeDomainData(this.dataArray); //domain data
         return this.dataArray;
     }
 
@@ -63,7 +68,7 @@ export class AudioCapture {
         for (let i = 0; i < data.length; i++) {
             sum += data[i];
         }
-        const average = sum / data.length;
+        const average = sum / data.length;        
         return Math.round((average / 255) * 100);
     }
 
@@ -88,11 +93,14 @@ export class AudioCapture {
     }
 
     getSampleRate() {
+        // depends on hardware and browser
         return this.audioContext ? this.audioContext.sampleRate : 0;
     }
 
     indexToFrequency(index) {
-        const nyquist = this.getSampleRate() / 2;
-        return (index * nyquist) / this.bufferLength;
+        // fft to hz
+        const nyquist = this.getSampleRate() / 2; 
+        return (index * nyquist) / this.bufferLen;
     }
 }
+

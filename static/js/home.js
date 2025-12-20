@@ -4,7 +4,7 @@ import { Settings } from './settings.js';
 import { AudioRecorder } from './recorder.js';
 import { AudioConverter } from './converter.js';
 
-console.log('Home app initializing...');
+/* console.log('Home app initializing...'); */
 
 window.settingsManager = new Settings();
 const visualizer = new Visualizer();
@@ -130,9 +130,9 @@ cancelFormat.addEventListener('click', () => {
     formatOptions.classList.remove('hidden');
     conversionLoading.classList.add('hidden');
     conversionLoading.classList.remove('flex');
-    
     pendingDownloadUrl = null;
     pendingDownloadFilename = null;
+    conversionLoading.style.display = 'none';
 });
 
 document.querySelectorAll('.format-btn').forEach(btn => {
@@ -393,6 +393,14 @@ async function uploadRecording(blob) {
         const data = await response.json();
         if (data.success) {
             infoBox.innerHTML = '<p class="text-green-400">Recording saved successfully</p>';
+            if (data.success) {
+                infoBox.innerHTML = '<p class="text-green-400">Recording saved successfully</p>';
+                await loadRecordings();
+                timerDisplay.textContent = '00:00';
+                setTimeout(() => {
+                    infoBox.innerHTML = '<p>Microphone active</p>';
+                }, 3000);
+            }
             await loadRecordings();
             setTimeout(() => {
                 infoBox.innerHTML = '<p>Microphone active</p>';
@@ -401,7 +409,7 @@ async function uploadRecording(blob) {
             infoBox.innerHTML = `<p class="text-red-400">Upload failed: ${data.error}</p>`;
         }
     } catch (error) {
-        console.error('Error uploading recording:', error);
+        console.error('Error uploading recording:', error); // debug remove in prod 
         infoBox.innerHTML = '<p class="text-red-400">Failed to save recording</p>';
     }
 }
@@ -454,7 +462,13 @@ startButton.addEventListener('click', async () => {
             startButton.innerHTML = '<i class="fas fa-microphone"></i>';
             startButton.classList.remove('active');
             startButton.disabled = false;
-            infoBox.innerHTML = `<p class="text-red-400">${error.message}</p>`;
+            if (error.message.includes('denied')) {
+                infoBox.innerHTML = `<p class="text-red-400">Microphone access denied. Please allow access in browser settings.</p>`;
+            } else if (error.message.includes('not found')) {
+                infoBox.innerHTML = `<p class="text-red-400">No microphone found. Please connect a microphone.</p>`;
+            } else {
+                infoBox.innerHTML = `<p class="text-red-400">${error.message}</p>`;
+            }
         }
     } else {
         isRunning = false;
@@ -472,7 +486,7 @@ startButton.addEventListener('click', async () => {
                 clearInterval(timerInterval);
                 timerInterval = null;
             }
-            
+            timerDisplay.textContent = '00:00';
             if (blob && blob.size > 0) {
                 await uploadRecording(blob);
             }
@@ -495,8 +509,10 @@ startButton.addEventListener('click', async () => {
 
 recordButton.addEventListener('click', async () => {
     if (!isRecording) {
+        if (recordButton.disabled) { // PREVENT MULTIPLE RECCORING SIMULATONIOUSLY
+            return;
+        }
         const started = recorder.startRecording();
-        
         if (started) {
             isRecording = true;
             recordButton.classList.add('active');
