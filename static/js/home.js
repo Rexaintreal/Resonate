@@ -392,19 +392,12 @@ async function uploadRecording(blob) {
         
         const data = await response.json();
         if (data.success) {
-            infoBox.innerHTML = '<p class="text-green-400">Recording saved successfully</p>';
-            if (data.success) {
-                infoBox.innerHTML = '<p class="text-green-400">Recording saved successfully</p>';
-                await loadRecordings();
-                timerDisplay.textContent = '00:00';
-                setTimeout(() => {
-                    infoBox.innerHTML = '<p>Microphone active</p>';
-                }, 3000);
-            }
-            await loadRecordings();
-            setTimeout(() => {
-                infoBox.innerHTML = '<p>Microphone active</p>';
-            }, 3000);
+        infoBox.innerHTML = '<p class="text-green-400">Recording saved successfully</p>';
+        await loadRecordings();
+        timerDisplay.textContent = '00:00';
+        setTimeout(() => {
+            infoBox.innerHTML = '<p class="text-green-400">Microphone active</p>';
+        }, 3000);
         } else {
             infoBox.innerHTML = `<p class="text-red-400">Upload failed: ${data.error}</p>`;
         }
@@ -509,7 +502,9 @@ startButton.addEventListener('click', async () => {
 
 recordButton.addEventListener('click', async () => {
     if (!isRecording) {
-        if (recordButton.disabled) { // PREVENT MULTIPLE RECCORING SIMULATONIOUSLY
+    // Prevent recording if microphone isn't active
+        if (!isRunning) {
+            window.toast.warning('Start microphone first', 'Click the microphone button to begin');
             return;
         }
         const started = recorder.startRecording();

@@ -13,6 +13,7 @@ export class Visualizer {
         this.audioElement = null;
         this.audioContext = null;
         this.sourceNode = null;
+        this.lastFrameTime = 0;
         
         this.setupCanvas();
     }
@@ -111,6 +112,13 @@ export class Visualizer {
 
     animate() {
         if (!this.isRunning) return;
+        // throttle to 30 fps for low end devices
+        const now = performance.now();
+        if (this.lastFrameTime && now - this.lastFrameTime < 33) {
+            this.animationId = requestAnimationFrame(() => this.animate());
+            return;
+        }
+        this.lastFrameTime = now;
 
         const width = this.canvas.offsetWidth;
         const height = this.canvas.offsetHeight;
