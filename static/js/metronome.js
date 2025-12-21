@@ -28,6 +28,10 @@ const confidenceValue = document.getElementById('confidenceValue');
 const confidenceFill = document.getElementById('confidenceFill');
 const syncBpmBtn = document.getElementById('syncBpmBtn');
 
+function getThemeColor(property) {
+    return getComputedStyle(document.documentElement).getPropertyValue(property).trim();
+}
+
 let audioContext = null;
 let isRunning = false;
 let currentBeat = 0;
@@ -245,7 +249,7 @@ detectBpmBtn.addEventListener('click', async () => {
             detectedBpmDisplay.classList.add('visible');
             confidenceContainer.style.opacity = '1';
             
-            infoBox.innerHTML = '<p style="color: #F59E0B;">Listening for beats... Play some music!</p>';
+            infoBox.innerHTML = `<p style="color: ${getThemeColor('--color-warning')};">Listening for beats... Play some music!</p>`;
             
             detectionInterval = setInterval(() => {
                 const result = bpmDetector.analyze();
@@ -270,7 +274,7 @@ detectBpmBtn.addEventListener('click', async () => {
             
         } catch (error) {
             console.error('Error starting detection:', error);
-            infoBox.innerHTML = '<p style="color: #EF4444;">Failed to access microphone</p>';
+            infoBox.innerHTML = `<p style="color: ${getThemeColor('--color-error')};">Failed to access microphone</p>`;
             isDetecting = false;
             detectBpmBtn.classList.remove('active');
             detectBtnText.textContent = 'Auto-Detect BPM';
@@ -305,7 +309,7 @@ syncBpmBtn.addEventListener('click', () => {
             bpmSlider.value = bpm;
             tempoStat.textContent = bpm + ' BPM';
             
-            infoBox.innerHTML = `<p style="color: #10B981;">Synced to ${bpm} BPM!</p>`;
+            infoBox.innerHTML = `<p style="color: ${getThemeColor('--color-success')};">Synced to ${bpm} BPM!</p>`;
             
             detectBpmBtn.click();
             
@@ -338,8 +342,8 @@ startButton.addEventListener('click', () => {
         startButton.classList.add('active');
         metronomeDisplay.classList.add('active');
         statusStat.textContent = 'Playing';
-        statusStat.style.color = '#10B981';
-        infoBox.innerHTML = '<p style="color: #10B981;">Metronome running</p>';
+        statusStat.style.color = getThemeColor('--color-success');
+        infoBox.innerHTML = `<p style="color: ${getThemeColor('--color-success')};">Metronome running</p>`;
         
         scheduler();
     } else {
@@ -354,7 +358,7 @@ startButton.addEventListener('click', () => {
         startButton.classList.remove('active');
         metronomeDisplay.classList.remove('active');
         statusStat.textContent = 'Stopped';
-        statusStat.style.color = '#14B8A6';
+        statusStat.style.color = getThemeColor('--color-accent');
         infoBox.innerHTML = '<p>Click play to start metronome</p>';
         
         const dots = beatIndicator.querySelectorAll('.beat-dot');

@@ -22,6 +22,10 @@ const referenceNotesGrid = document.getElementById('referenceNotesGrid');
 const instrumentButtons = document.querySelectorAll('.instrument-btn');
 const tuningButtons = document.querySelectorAll('.tuning-btn');
 
+function getThemeColor(property) {
+    return getComputedStyle(document.documentElement).getPropertyValue(property).trim();
+}
+
 const audioCapture = new AudioCapture();
 const pitchDetector = new PitchDetector();
 let isRunning = false;
@@ -263,11 +267,11 @@ function updateNeedle(cents) {
     const angle = (clampedCents / maxCents) * 90;
     tunerNeedle.setAttribute('transform', `rotate(${angle} 200 180)`);
     
-    let needleColor = '#14B8A6';
+    let needleColor = getThemeColor('--color-accent');
     if (Math.abs(cents) <= 5) {
-        needleColor = '#10B981';
+        needleColor = getThemeColor('--color-success');
     } else if (Math.abs(cents) > 25) {
-        needleColor = cents > 0 ? '#F59E0B' : '#3B82F6';
+        needleColor = cents > 0 ? getThemeColor('--color-warning') : getThemeColor('--color-info');
     }
     
     const needleLine = tunerNeedle.querySelector('line');
@@ -312,15 +316,15 @@ startButton.addEventListener('click', async () => {
                         tunerGaugeContainer.classList.add('in-tune');
                         tunerStatusDisplay.textContent = '✓ Perfect Tune!';
                         statusStat.textContent = 'In Tune';
-                        statusStat.style.color = '#10B981';
+                        statusStat.style.color = getThemeColor('--color-success');
                     } else if (pitchData.cents > 0) {
                         tunerStatusDisplay.textContent = 'Too Sharp ♯ - Tune Down';
                         statusStat.textContent = 'Sharp';
-                        statusStat.style.color = '#F59E0B';
+                        statusStat.style.color = getThemeColor('--color-warning');
                     } else {
                         tunerStatusDisplay.textContent = 'Too Flat ♭ - Tune Up';
                         statusStat.textContent = 'Flat';
-                        statusStat.style.color = '#3B82F6';
+                        statusStat.style.color = getThemeColor('--color-info');
                     }
                 } else {
                     tunerNoteDisplay.textContent = '--';
@@ -331,7 +335,7 @@ startButton.addEventListener('click', async () => {
                     updateNeedle(0);
                     
                     statusStat.textContent = 'Listening';
-                    statusStat.style.color = '#14B8A6';
+                    statusStat.style.color = getThemeColor('--color-accent');
                 }
             }, 100);
 
@@ -361,7 +365,7 @@ startButton.addEventListener('click', async () => {
         freqStat.textContent = '-- Hz';
         centsStat.textContent = '0¢';
         statusStat.textContent = 'Idle';
-        statusStat.style.color = '#14B8A6';
+        statusStat.style.color = getThemeColor('--color-accent');
         
         infoBox.innerHTML = '<p>Click microphone to start tuning</p>';
     }

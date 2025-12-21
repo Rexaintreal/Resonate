@@ -18,6 +18,10 @@ export class Visualizer {
         this.setupCanvas();
     }
 
+    getThemeColor(property) {
+        return getComputedStyle(document.documentElement).getPropertyValue(property).trim();
+    }
+
     setupCanvas() {
         const resizeCanvas = () => {
             const rect = this.canvas.getBoundingClientRect();
@@ -193,10 +197,13 @@ export class Visualizer {
         const barCount = window.settingsManager ? window.settingsManager.getSettings().barCount : 64;
         const bars = this.getLogFrequencyData(barCount);
         const barWidth = width / bars.length;
+        
+        // Create gradient using theme colors
+        const accentColor = this.getThemeColor('--color-accent');
         const gradient = this.ctx.createLinearGradient(0, height, 0, 0);
-        gradient.addColorStop(0, '#14B8A6');
-        gradient.addColorStop(0.5, '#2DD4BF');
-        gradient.addColorStop(1, '#5EEAD4');
+        gradient.addColorStop(0, accentColor);
+        gradient.addColorStop(0.5, accentColor + 'dd');
+        gradient.addColorStop(1, accentColor + 'aa');
 
         const maxHeight = height * 0.90;
 
@@ -214,12 +221,13 @@ export class Visualizer {
 
     drawWaveform(width, height) {
         const waveform = this.fftProcessor.getWaveform(512);
+        const accentColor = this.getThemeColor('--color-accent');
         
         this.ctx.beginPath();
-        this.ctx.strokeStyle = '#14B8A6';
+        this.ctx.strokeStyle = accentColor;
         this.ctx.lineWidth = 2.5;
         this.ctx.shadowBlur = 10;
-        this.ctx.shadowColor = '#14B8A6';
+        this.ctx.shadowColor = accentColor;
 
         const sliceWidth = width / waveform.length;
         let x = 0;
@@ -245,8 +253,10 @@ export class Visualizer {
         const centerY = height / 2;
         const maxRadius = Math.min(width, height) * 0.42;
         const minRadius = maxRadius * 0.25;
+        const borderColor = this.getThemeColor('--border-primary');
+        const accentColor = this.getThemeColor('--color-accent');
 
-        this.ctx.strokeStyle = '#262626';
+        this.ctx.strokeStyle = borderColor;
         this.ctx.lineWidth = 1;
         this.ctx.beginPath();
         this.ctx.arc(centerX, centerY, minRadius, 0, Math.PI * 2);
@@ -264,16 +274,9 @@ export class Visualizer {
             const y2 = centerY + Math.sin(angle) * (minRadius + barHeight);
 
             const progress = i / bars.length;
-            let hue;
-            if (progress < 0.33) {
-                hue = 174 + progress * 30;
-            } else if (progress < 0.66) {
-                hue = 184 + (progress - 0.33) * 20;
-            } else {
-                hue = 174 - (progress - 0.66) * 20;
-            }
+            const opacity = 0.5 + (progress * 0.5);
             
-            this.ctx.strokeStyle = `hsl(${hue}, 65%, 55%)`;
+            this.ctx.strokeStyle = accentColor + Math.floor(opacity * 255).toString(16).padStart(2, '0');
             this.ctx.lineWidth = 2.5;
             this.ctx.beginPath();
             this.ctx.moveTo(x1, y1);
@@ -281,7 +284,7 @@ export class Visualizer {
             this.ctx.stroke();
         });
         
-        this.ctx.fillStyle = 'rgba(20, 184, 166, 0.05)';
+        this.ctx.fillStyle = accentColor + '0d';
         this.ctx.beginPath();
         this.ctx.arc(centerX, centerY, minRadius, 0, Math.PI * 2);
         this.ctx.fill();
@@ -292,13 +295,14 @@ export class Visualizer {
         const barCount = window.settingsManager ? 
             Math.floor(window.settingsManager.getSettings().barCount * 1.25) : 80;
         const bars = this.getLogFrequencyData(barCount);
+        const accentColor = this.getThemeColor('--color-accent');
         
         this.ctx.beginPath();
-        this.ctx.strokeStyle = '#14B8A6';
+        this.ctx.strokeStyle = accentColor;
         this.ctx.lineWidth = 3;
         this.ctx.lineJoin = 'round';
         this.ctx.shadowBlur = 8;
-        this.ctx.shadowColor = '#14B8A6';
+        this.ctx.shadowColor = accentColor;
 
         const step = width / bars.length;
         const maxHeight = height * 0.90;
@@ -319,8 +323,8 @@ export class Visualizer {
         this.ctx.shadowBlur = 0;
 
         const gradient = this.ctx.createLinearGradient(0, 0, 0, height);
-        gradient.addColorStop(0, 'rgba(20, 184, 166, 0.3)');
-        gradient.addColorStop(1, 'rgba(20, 184, 166, 0.05)');
+        gradient.addColorStop(0, accentColor + '4d');
+        gradient.addColorStop(1, accentColor + '0d');
         
         this.ctx.fillStyle = gradient;
         this.ctx.lineTo(width, height);

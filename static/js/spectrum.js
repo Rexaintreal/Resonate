@@ -19,6 +19,10 @@ const statusStat = document.getElementById('statusStat');
 const audioCapture = new AudioCapture();
 const fftProcessor = new FFTProcessor(audioCapture);
 
+function getThemeColor(property) {
+    return getComputedStyle(document.documentElement).getPropertyValue(property).trim();
+}
+
 let isRunning = false;
 let animationId = null;
 
@@ -196,7 +200,7 @@ startButton.addEventListener('click', async () => {
             spectrumDisplay.classList.add('active');
             infoBox.innerHTML = '<p class="text-green-400">Spectrum analysis active</p>';
             statusStat.textContent = 'Analyzing';
-            statusStat.style.color = '#10B981';
+            statusStat.style.color = getThemeColor('--color-success');
 
             createSpectrumBands();
             updateSpectrumDisplay();
@@ -231,7 +235,7 @@ startButton.addEventListener('click', async () => {
         dominantStat.textContent = '--';
         energyStat.textContent = '0%';
         statusStat.textContent = 'Idle';
-        statusStat.style.color = '#14B8A6';
+        statusStat.style.color = getThemeColor('--color-accent');
         
         frequencyRanges.forEach(range => {
             if (range.bar && range.value) {
