@@ -34,14 +34,14 @@
 }
 
 .chord-sidebar::-webkit-scrollbar { width: 6px; }
-.chord-sidebar::-webkit-scrollbar-track { background: #171717; }
-.chord-sidebar::-webkit-scrollbar-thumb { background: #262626; border-radius: 3px; }
+.chord-sidebar::-webkit-scrollbar-track { background: var(--bg-tertiary); }
+.chord-sidebar::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 3px; }
 
 .chord-display-container {
     flex: 1;
     min-height: 0; 
-    background: #111111;
-    border: 1px solid #262626;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
     border-radius: 16px;
     padding: 20px;
     display: flex;
@@ -52,26 +52,26 @@
 }
 
 .chord-display-container.active {
-    border-color: #14B8A6;
-    box-shadow: 0 0 30px rgba(20, 184, 166, 0.15);
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 30px var(--shadow-teal);
 }
 
 .chord-name-display {
     font-size: clamp(4rem, 15vh, 9rem); 
     font-weight: 900;
     font-family: 'Montserrat', sans-serif;
-    color: #525252;
+    color: var(--text-disabled);
     line-height: 1;
     margin-bottom: 2vh;
     transition: all 0.3s ease;
     text-align: center;
 }
 
-.chord-display-container.active .chord-name-display { color: #14B8A6; }
+.chord-display-container.active .chord-name-display { color: var(--accent-teal); }
 
 .chord-type-display {
     font-size: clamp(1.2rem, 3vh, 2rem);
-    color: #737373;
+    color: var(--text-muted);
     font-family: 'Montserrat', sans-serif;
     margin-bottom: 4vh;
     font-weight: 600;
@@ -86,40 +86,40 @@
 }
 
 .note-badge {
-    background: #171717;
-    border: 2px solid #262626;
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border-primary);
     border-radius: 12px;
     padding: 12px 20px;
     font-size: clamp(1rem, 2vh, 1.5rem);
     font-weight: 700;
     font-family: 'Montserrat', sans-serif;
-    color: #737373;
+    color: var(--text-muted);
     min-width: 60px;
     text-align: center;
     transition: all 0.2s;
 }
 
 .note-badge.active {
-    border-color: #14B8A6;
-    color: #14B8A6;
+    border-color: var(--accent-teal);
+    color: var(--accent-teal);
     background: rgba(20, 184, 166, 0.1);
     box-shadow: 0 0 15px rgba(20, 184, 166, 0.3);
 }
 
 .confidence-display {
     font-size: 14px;
-    color: #737373;
+    color: var(--text-muted);
     font-family: 'Montserrat', sans-serif;
     margin-top: auto; 
 }
 
-.confidence-display.high { color: #10B981; }
-.confidence-display.medium { color: #F59E0B; }
-.confidence-display.low { color: #EF4444; }
+.confidence-display.high { color: var(--accent-green); }
+.confidence-display.medium { color: var(--accent-orange); }
+.confidence-display.low { color: var(--accent-red); }
 
 .chord-section-card {
-    background: #111111;
-    border: 1px solid #262626;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
     border-radius: 16px;
     padding: 20px;
     flex-shrink: 0;
@@ -127,7 +127,7 @@
 
 .chord-section-title {
     font-size: 14px;
-    color: #E5E5E5;
+    color: var(--text-secondary);
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
     margin-bottom: 12px;
@@ -144,8 +144,8 @@
 
 .wheel-note {
     aspect-ratio: 1;
-    background: #171717;
-    border: 1px solid #262626;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -153,13 +153,13 @@
     font-size: 14px;
     font-weight: 700;
     font-family: 'Montserrat', sans-serif;
-    color: #525252;
+    color: var(--text-disabled);
     transition: all 0.2s;
 }
 
 .wheel-note.active {
-    background: #14B8A6;
-    border-color: #14B8A6;
+    background: var(--accent-teal);
+    border-color: var(--accent-teal);
     color: white;
     box-shadow: 0 0 15px rgba(20, 184, 166, 0.5);
     transform: scale(1.1);
@@ -174,14 +174,14 @@
 }
 
 .history-chord {
-    background: #171717;
-    border: 1px solid #262626;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
     border-radius: 8px;
     padding: 10px;
     font-size: 14px;
     font-weight: 600;
     font-family: 'Montserrat', sans-serif;
-    color: #A3A3A3;
+    color: var(--text-tertiary);
     text-align: center;
 }
 
