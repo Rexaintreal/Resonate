@@ -11,9 +11,9 @@
 .skeleton {
     background: linear-gradient(
         90deg,
-        #171717 0%,
-        #262626 50%,
-        #171717 100%
+        var(--skeleton-base) 0%,
+        var(--skeleton-highlight) 50%,
+        var(--skeleton-base) 100%
     );
     background-size: 1000px 100%;
     animation: shimmer 2s infinite linear;
@@ -23,7 +23,7 @@
 .skeleton-container {
     position: absolute;
     inset: 0;
-    background: #0A0A0A;
+    background: var(--bg-primary);
     z-index: 40;
     transition: opacity 0.3s ease;
 }
@@ -68,8 +68,8 @@
 }
 
 .skeleton-display {
-    background: #111111;
-    border: 1px solid #262626;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
     border-radius: 16px;
     padding: 40px;
     display: flex;
@@ -106,8 +106,8 @@
 }
 
 .skeleton-stat-card {
-    background: #111111;
-    border: 1px solid #262626;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
     border-radius: 12px;
     padding: 16px;
     display: flex;
@@ -128,10 +128,10 @@
 .skeleton-mode-selector {
     display: flex;
     gap: 8px;
-    background: #111111;
+    background: var(--bg-secondary);
     padding: 4px;
     border-radius: 12px;
-    border: 1px solid #262626;
+    border: 1px solid var(--border-primary);
     width: fit-content;
 }
 
@@ -142,8 +142,8 @@
 }
 
 .skeleton-sidebar {
-    background: #111111;
-    border: 1px solid #262626;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
     border-radius: 16px;
     padding: 20px;
     display: flex;
@@ -156,7 +156,7 @@
     justify-content: space-between;
     align-items: center;
     padding-bottom: 12px;
-    border-bottom: 1px solid #262626;
+    border-bottom: 1px solid var(--border-primary);
 }
 
 .skeleton-sidebar-title {
@@ -165,8 +165,8 @@
 }
 
 .skeleton-list-item {
-    background: #171717;
-    border: 1px solid #262626;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
     border-radius: 10px;
     padding: 12px;
     display: flex;
@@ -206,8 +206,8 @@
     width: 100%;
     height: 100%;
     min-height: 300px;
-    background: #111111;
-    border: 1px solid #262626;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
     border-radius: 16px;
     display: flex;
     align-items: center;
@@ -228,9 +228,9 @@
     flex: 1;
     background: linear-gradient(
         90deg,
-        #171717 0%,
-        #262626 50%,
-        #171717 100%
+        var(--skeleton-base) 0%,
+        var(--skeleton-highlight) 50%,
+        var(--skeleton-base) 100%
     );
     background-size: 1000px 100%;
     animation: shimmer 2s infinite linear;
@@ -299,8 +299,8 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-    background: #111111;
-    border: 1px solid #262626;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
     border-radius: 16px;
     padding: 24px;
 }
@@ -351,8 +351,8 @@
 
 .skeleton-spectrum-bands {
     flex: 1;
-    background: #0A0A0A;
-    border: 1px solid #262626;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
     border-radius: 12px;
     padding: 20px;
     display: flex;
@@ -362,8 +362,8 @@
 
 .skeleton-peak-display {
     width: 220px;
-    background: #0A0A0A;
-    border: 1px solid #262626;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
     border-radius: 12px;
     padding: 20px;
     display: flex;
@@ -390,8 +390,8 @@
 }
 
 .skeleton-freq-card {
-    background: #171717;
-    border: 1px solid #262626;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
     border-radius: 12px;
     padding: 12px;
     display: flex;

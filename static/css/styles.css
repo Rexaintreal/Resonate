@@ -5,8 +5,8 @@
 }
 
 body {
-    background-color: #000000;
-    color: #FFFFFF;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     font-family: 'Inter', sans-serif;
     height: 100vh;
     display: flex;
@@ -24,7 +24,7 @@ body {
 
 .content h2 {
     font-family: "Poppins", sans-serif;
-    color: #fff;
+    color: var(--text-primary);
     font-size: 6em;
     position: absolute;
     transform: translate(-50%, -50%);
@@ -69,8 +69,8 @@ body {
 }
 
 .btn-pill-white {
-    background-color: #262626;
-    color: #F4F4F4;
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
     border-radius: 6px;
     padding: 10px 24px;
     font-weight: 600;
@@ -81,14 +81,14 @@ body {
 }
 
 .btn-pill-white:hover {
-    background-color: #333333;
+    background-color: var(--border-secondary);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px var(--shadow-sm);
 }
 
 .btn-pill-explore {
-    background-color: #FFFFFF;
-    color: #000000;
+    background-color: var(--text-primary);
+    color: var(--bg-primary);
     border-radius: 9999px;
     padding: 12px 32px;
     font-weight: 600;
@@ -100,9 +100,9 @@ body {
 }
 
 .btn-pill-explore:hover {
-    background-color: #e2e2e2;
+    opacity: 0.9;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px var(--shadow-sm);
 }
 
 .waves {
@@ -172,8 +172,8 @@ footer {
 }
 
 .toast {
-    background: rgba(23, 23, 23, 0.98);
-    border: 1px solid #262626;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
     border-radius: 12px;
     padding: 16px 20px;
     min-width: 320px;
@@ -181,7 +181,7 @@ footer {
     display: flex;
     align-items: center;
     gap: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 32px var(--shadow-sm);
     backdrop-filter: blur(12px);
     pointer-events: auto;
     animation: toastSlideIn 0.3s ease;
@@ -238,14 +238,14 @@ footer {
 
 .toast-message {
     font-size: 13px;
-    color: #A3A3A3;
+    color: var(--text-tertiary);
     line-height: 1.4;
 }
 
 .toast-close {
     background: transparent;
     border: none;
-    color: #737373;
+    color: var(--text-muted);
     cursor: pointer;
     padding: 4px;
     display: flex;
@@ -257,7 +257,7 @@ footer {
 }
 
 .toast-close:hover {
-    color: #E5E5E5;
+    color: var(--text-secondary);
 }
 
 .toast-progress {
@@ -285,15 +285,15 @@ footer {
 
 .toast.success .toast-icon {
     background: rgba(16, 185, 129, 0.15);
-    color: #10B981;
+    color: var(--accent-green);
 }
 
 .toast.success .toast-title {
-    color: #10B981;
+    color: var(--accent-green);
 }
 
 .toast.success .toast-progress {
-    color: #10B981;
+    color: var(--accent-green);
 }
 
 .toast.error {
@@ -303,15 +303,15 @@ footer {
 
 .toast.error .toast-icon {
     background: rgba(239, 68, 68, 0.15);
-    color: #EF4444;
+    color: var(--accent-red);
 }
 
 .toast.error .toast-title {
-    color: #EF4444;
+    color: var(--accent-red);
 }
 
 .toast.error .toast-progress {
-    color: #EF4444;
+    color: var(--accent-red);
 }
 
 .toast.info {
@@ -321,15 +321,15 @@ footer {
 
 .toast.info .toast-icon {
     background: rgba(59, 130, 246, 0.15);
-    color: #3B82F6;
+    color: var(--accent-blue);
 }
 
 .toast.info .toast-title {
-    color: #3B82F6;
+    color: var(--accent-blue);
 }
 
 .toast.info .toast-progress {
-    color: #3B82F6;
+    color: var(--accent-blue);
 }
 
 .toast.warning {
@@ -339,27 +339,27 @@ footer {
 
 .toast.warning .toast-icon {
     background: rgba(245, 158, 11, 0.15);
-    color: #F59E0B;
+    color: var(--accent-orange);
 }
 
 .toast.warning .toast-title {
-    color: #F59E0B;
+    color: var(--accent-orange);
 }
 
 .toast.warning .toast-progress {
-    color: #F59E0B;
+    color: var(--accent-orange);
 }
 
 .shortcuts-hint {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background: rgba(23, 23, 23, 0.95);
-    border: 1px solid #262626;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
     border-radius: 12px;
     padding: 12px 16px;
     font-size: 12px;
-    color: #737373;
+    color: var(--text-muted);
     font-family: 'Inter', sans-serif;
     display: flex;
     align-items: center;
@@ -372,20 +372,20 @@ footer {
 }
 
 .shortcuts-hint:hover {
-    background: rgba(38, 38, 38, 0.95);
-    border-color: #404040;
+    background: var(--border-primary);
+    border-color: var(--border-secondary);
     transform: translateY(-2px);
 }
 
 .shortcuts-hint-icon {
     width: 24px;
     height: 24px;
-    background: #262626;
+    background: var(--border-primary);
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #14B8A6;
+    color: var(--accent-teal);
     font-weight: 600;
     font-size: 14px;
 }
@@ -424,8 +424,8 @@ footer {
 }
 
 .shortcuts-modal-content {
-    background: #171717;
-    border: 1px solid #262626;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
     border-radius: 16px;
     padding: 32px;
     max-width: 500px;
@@ -457,13 +457,13 @@ footer {
     font-family: 'Montserrat', sans-serif;
     font-size: 24px;
     font-weight: 700;
-    color: #FFFFFF;
+    color: var(--text-primary);
 }
 
 .shortcuts-modal-close {
     background: transparent;
     border: none;
-    color: #737373;
+    color: var(--text-muted);
     font-size: 24px;
     cursor: pointer;
     padding: 4px;
@@ -472,7 +472,7 @@ footer {
 }
 
 .shortcuts-modal-close:hover {
-    color: #E5E5E5;
+    color: var(--text-secondary);
 }
 
 .shortcuts-list {
@@ -486,19 +486,19 @@ footer {
     justify-content: space-between;
     align-items: center;
     padding: 12px;
-    background: #0A0A0A;
-    border: 1px solid #1F1F1F;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-tertiary);
     border-radius: 8px;
     transition: all 0.2s ease;
 }
 
 .shortcut-item:hover {
-    background: #111111;
-    border-color: #262626;
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
 }
 
 .shortcut-description {
-    color: #E5E5E5;
+    color: var(--text-secondary);
     font-size: 14px;
     font-weight: 500;
 }
@@ -509,17 +509,17 @@ footer {
 }
 
 .shortcut-key {
-    background: #262626;
-    border: 1px solid #404040;
+    background: var(--border-primary);
+    border: 1px solid var(--border-secondary);
     border-radius: 6px;
     padding: 6px 12px;
     font-size: 12px;
     font-weight: 600;
-    color: #14B8A6;
+    color: var(--accent-teal);
     font-family: 'Montserrat', monospace;
     min-width: 32px;
     text-align: center;
-    box-shadow: 0 2px 0 #1F1F1F;
+    box-shadow: 0 2px 0 var(--border-tertiary);
 }
 
 @media (max-width: 768px) {
