@@ -44,10 +44,128 @@ const formatModal = document.getElementById('formatModal');
 const cancelFormat = document.getElementById('cancelFormat');
 const formatOptions = document.getElementById('formatOptions');
 const conversionLoading = document.getElementById('conversionLoading');
+const uploadModal = document.getElementById('uploadModal');
+const uploadFileName = document.getElementById('uploadFileName');
+const uploadPercent = document.getElementById('uploadPercent');
+const uploadProgressBar = document.getElementById('uploadProgressBar');
+const uploadStatus = document.getElementById('uploadStatus');
+const uploadComplete = document.getElementById('uploadComplete');
+const uploadError = document.getElementById('uploadError');
+const uploadErrorMessage = document.getElementById('uploadErrorMessage');
+const closeUploadError = document.getElementById('closeUploadError');
+const fileUploadInput = document.getElementById('fileUploadInput');
 
 let pendingDeleteFilename = null;
 let pendingDownloadUrl = null;
 let pendingDownloadFilename = null;
+
+function resetUploadModal() {
+    uploadFileName.textContent = 'Preparing upload...';
+    uploadPercent.textContent = '0%';
+    uploadProgressBar.style.width = '0%';
+    uploadStatus.classList.remove('hidden');
+    uploadComplete.classList.add('hidden');
+    uploadError.classList.add('hidden');
+}
+
+function showUploadModal() {
+    resetUploadModal();
+    uploadModal.classList.remove('hidden');
+    uploadModal.classList.add('flex');
+}
+
+function hideUploadModal() {
+    uploadModal.classList.add('hidden');
+    uploadModal.classList.remove('flex');
+}
+
+function showUploadError(message) {
+    uploadStatus.classList.add('hidden');
+    uploadComplete.classList.add('hidden');
+    uploadError.classList.remove('hidden');
+    uploadErrorMessage.textContent = message || 'Upload failed';
+    window.toast.error('Upload failed', message);
+}
+
+closeUploadError?.addEventListener('click', () => {
+    hideUploadModal();
+});
+
+uploadModal?.addEventListener('click', (e) => {
+    if (e.target === uploadModal) {
+        if (!uploadComplete.classList.contains('hidden') || !uploadError.classList.contains('hidden')) {
+            hideUploadModal();
+        }
+    }
+});
+
+fileUploadInput?.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+
+    if (!file.type.startsWith('audio/')) {
+        window.toast.error('Invalid file', 'Please select an audio file');
+        fileUploadInput.value = '';
+        return;
+    }
+    const maxSize = 50 * 1024 * 1024;
+    if (file.size > maxSize) {
+        window.toast.error('File too large', 'Maximum file size is 50MB');
+        fileUploadInput.value = '';
+        return;
+    }
+
+    showUploadModal();
+    uploadFileName.textContent = file.name;
+    const formData = new FormData();
+    formData.append('audio', file);
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+            const percentComplete = Math.round((e.loaded / e.total) * 100);
+            uploadPercent.textContent = percentComplete + '%';
+            uploadProgressBar.style.width = percentComplete + '%';
+        }
+    });
+
+    xhr.addEventListener('load', async () => {
+        if (xhr.status === 200) {
+            try {
+                const data = JSON.parse(xhr.responseText);
+                if (data.success) {
+                    uploadStatus.classList.add('hidden');
+                    uploadComplete.classList.remove('hidden');
+                    uploadPercent.textContent = '100%';
+                    uploadProgressBar.style.width = '100%';
+                    
+                    window.toast.success('Upload complete', 'File added to your library');
+                    await loadRecordings();
+                    setTimeout(() => {
+                        hideUploadModal();
+                    }, 1500);
+                } else {
+                    throw new Error(data.error || 'Upload failed');
+                }
+            } catch (error) {
+                showUploadError(error.message);
+            }
+        } else {
+            showUploadError('Server error: ' + xhr.status);
+        }
+    });
+    xhr.addEventListener('error', () => {
+        showUploadError('Network error occurred');
+    });
+
+    xhr.addEventListener('abort', () => {
+        showUploadError('Upload cancelled');
+    });
+    xhr.open('POST', '/api/upload-recording');
+    xhr.send(formData);
+    fileUploadInput.value = '';
+});
 
 logoutIcon.addEventListener('click', (e) => {
     e.preventDefault();
@@ -137,7 +255,6 @@ cancelFormat.addEventListener('click', () => {
     conversionLoading.classList.remove('flex');
     pendingDownloadUrl = null;
     pendingDownloadFilename = null;
-    conversionLoading.style.display = 'none';
 });
 
 document.querySelectorAll('.format-btn').forEach(btn => {
@@ -150,9 +267,9 @@ document.querySelectorAll('.format-btn').forEach(btn => {
 
             try {
                 let downloadUrl = pendingDownloadUrl;
-                let finalFilename = pendingDownloadFilename.replace('.webm', '') + '.' + format;
+                let finalFilename = pendingDownloadFilename.replace(/\.\w+$/, '') + '.' + format;
 
-                if (format !== 'webm') {
+                if (format !== 'webm' && !pendingDownloadFilename.endsWith('.' + format)) {
                     const blob = await converter.convert(pendingDownloadUrl, format);
                     if (blob) {
                         downloadUrl = URL.createObjectURL(blob);
@@ -171,7 +288,7 @@ document.querySelectorAll('.format-btn').forEach(btn => {
                 a.click();
                 document.body.removeChild(a);
 
-                if (format !== 'webm') {
+                if (downloadUrl !== pendingDownloadUrl) {
                     setTimeout(() => URL.revokeObjectURL(downloadUrl), 100);
                 }
 
@@ -402,13 +519,13 @@ async function uploadRecording(blob) {
         
         const data = await response.json();
         if (data.success) {
-        window.toast.success('Recording saved', 'Added to your library');
-        infoBox.innerHTML = '<p class="text-green-400">Recording saved successfully</p>';
-        await loadRecordings();
-        timerDisplay.textContent = '00:00';
-        setTimeout(() => {
-            infoBox.innerHTML = '<p class="text-green-400">Microphone active</p>';
-        }, 3000);
+            window.toast.success('Recording saved', 'Added to your library');
+            infoBox.innerHTML = '<p class="text-green-400">Recording saved successfully</p>';
+            await loadRecordings();
+            timerDisplay.textContent = '00:00';
+            setTimeout(() => {
+                infoBox.innerHTML = '<p class="text-green-400">Microphone active</p>';
+            }, 3000);
         } else {
             window.toast.error('Save failed', data.error || 'Could not save recording');
             infoBox.innerHTML = `<p class="text-red-400">Upload failed: ${data.error}</p>`;
@@ -419,7 +536,7 @@ async function uploadRecording(blob) {
         infoBox.innerHTML = '<p class="text-red-400">Failed to save recording</p>';
     }
 }
-// update stats display
+
 function updatePracticeDisplay() {
     const todayStats = practiceTracker.getTodayStats();
     const weekStats = practiceTracker.getWeekStats();
@@ -435,7 +552,6 @@ function updatePracticeDisplay() {
         weekEl.textContent = practiceTracker.formatMinutes(weekStats.minutes);
     }
     
-    //update again eveyr 60s if sesison is active
     if (practiceTracker.isActive()) {
         setTimeout(updatePracticeDisplay, 60000);
     }
@@ -469,7 +585,6 @@ startButton.addEventListener('click', async () => {
             startButton.disabled = false;
             infoBox.innerHTML = '<p class="text-green-400">Microphone active</p>';
             
-            // start track session
             practiceTracker.startSession('visualizer');
             updatePracticeDisplay();
 
@@ -507,7 +622,6 @@ startButton.addEventListener('click', async () => {
     } else {
         isRunning = false;
         
-        //end session
         const session = practiceTracker.endSession();
         if (session) {
             const duration = practiceTracker.formatMinutes(Math.floor(session.duration / 60));
@@ -552,7 +666,6 @@ startButton.addEventListener('click', async () => {
 
 recordButton.addEventListener('click', async () => {
     if (!isRecording) {
-    //check mic is running or not
         if (!isRunning) {
             window.toast.warning('Start microphone first', 'Click the microphone button to begin');
             return;

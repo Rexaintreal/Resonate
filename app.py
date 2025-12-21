@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, url_for, request, jsonify, send_from_directory
+from flask import Flask, render_template, session, redirect, url_for, request, jsonify
 from functools import wraps
 import os
 from dotenv import load_dotenv
@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-here')
 
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
-ALLOWED_EXTENSIONS = {'webm', 'wav', 'mp3', 'ogg'}
+ALLOWED_EXTENSIONS = {'webm', 'wav', 'mp3', 'ogg', 'm4a', 'aac', 'flac', 'opus'} #more file support
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -137,11 +137,15 @@ def upload_recording():
         file = request.files['audio']
         if file.filename == '':
             return jsonify({'success': False, 'error': 'No file selected'}), 400
+        if not allowed_file(file.filename):
+            return jsonify({'success': False, 'error': 'File type not supported. Supported formats: ' + ', '.join(ALLOWED_EXTENSIONS)}), 400
+        
+        original_extension = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else 'webm'
         
         user_id = session['user']['uid']
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         unique_id = str(uuid.uuid4())[:8]
-        filename = f"{user_id}_{timestamp}_{unique_id}.webm"
+        filename = f"{user_id}_{timestamp}_{unique_id}.{original_extension}"
         
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
@@ -186,7 +190,7 @@ def get_recordings():
         recordings = []
         
         for filename in os.listdir(app.config['UPLOAD_FOLDER']):
-            if filename.startswith(user_id) and filename.endswith('.webm'):
+            if filename.startswith(user_id) and any(filename.endswith(f'.{ext}') for ext in ALLOWED_EXTENSIONS):
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 recordings.append({
                     'filename': filename,
