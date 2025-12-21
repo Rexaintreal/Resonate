@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spectrum Analyzer - Resonate</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-toggle.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/visualizer.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/spectrum.css') }}">
@@ -22,60 +24,103 @@
             FIREBASE_APP_ID: "{{ config.FIREBASE_APP_ID }}"
         };
     </script>
+    
+    <style>
+        .modal-content {
+            background: var(--bg-tertiary) !important;
+            border-color: var(--border-primary) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .modal-icon-bg {
+            background: var(--border-primary) !important;
+        }
+
+        .modal-text {
+            color: var(--text-tertiary) !important;
+        }
+
+        .modal-btn-secondary {
+            background: var(--border-primary) !important;
+            border-color: var(--border-secondary) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .modal-btn-secondary:hover {
+            background: var(--border-secondary) !important;
+        }
+
+        .nav-bg {
+            background: var(--bg-primary) !important;
+            border-color: var(--border-primary) !important;
+        }
+
+        .nav-text {
+            color: var(--text-muted) !important;
+        }
+
+        .nav-text:hover {
+            color: var(--text-primary) !important;
+        }
+
+        .nav-logo-text {
+            color: var(--text-primary) !important;
+        }
+    </style>
  </head>
 <body>
     <div id="logoutModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-overlay">
-        <div class="bg-[#171717] border-2 border-[#262626] rounded-2xl p-8 max-w-md w-full shadow-2xl modal-content">
+        <div class="modal-content border-2 rounded-2xl p-8 max-w-md w-full shadow-2xl">
             <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-[#262626] rounded-full flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-sign-out-alt text-2xl text-[#737373]"></i>
+                <div class="w-12 h-12 modal-icon-bg rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-sign-out-alt text-2xl nav-text"></i>
                 </div>
-                <h3 class="font-['Montserrat'] font-bold text-2xl text-white">Sign Out</h3>
+                <h3 class="font-['Montserrat'] font-bold text-2xl">Sign Out</h3>
             </div>
-            <p class="text-[#A3A3A3] mb-6 leading-relaxed font-['Inter']">Are you sure you want to sign out?</p>
+            <p class="modal-text mb-6 leading-relaxed font-['Inter']">Are you sure you want to sign out?</p>
             <div class="flex gap-3">
-                <button id="cancelLogout" class="flex-1 bg-[#262626] hover:bg-[#333333] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter'] border border-[#404040]">Cancel</button>
+                <button id="cancelLogout" class="flex-1 modal-btn-secondary font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter'] border">Cancel</button>
                 <button id="confirmLogout" class="flex-1 bg-[#14B8A6] hover:bg-[#0F766E] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 font-['Inter']">Sign Out</button>
             </div>
         </div>
     </div>
 
-    <nav class="w-full py-4 px-6 md:px-12 border-b border-[#262626] bg-[#0A0A0A] sticky top-0 z-50">
+    <nav class="nav-bg w-full py-4 px-6 md:px-12 border-b sticky top-0 z-50">
         <div class="flex justify-between items-center w-full">
             <div class="flex items-center gap-3">
                 <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Resonate" class="h-10 w-10 object-contain">
-                <span class="font-['Montserrat'] font-bold text-2xl tracking-tight text-white hidden sm:block">Resonate</span>
+                <span class="font-['Montserrat'] font-bold text-2xl tracking-tight nav-logo-text hidden sm:block">Resonate</span>
             </div>
 
             <div class="flex items-center gap-4 md:gap-8">
                 <div class="hidden lg:flex items-center gap-6">
-                    <a href="/home" class="text-sm font-medium text-[#737373] hover:text-white transition-colors">Visualizer</a>
-                    <a href="/pitch" class="text-sm font-medium text-[#737373] hover:text-white transition-colors">Pitch</a>
-                    <a href="/tuner" class="text-sm font-medium text-[#737373] hover:text-white transition-colors">Tuner</a>
-                    <a href="/metronome" class="text-sm font-medium text-[#737373] hover:text-white transition-colors">Metronome</a>
-                    <a href="/chords" class="text-sm font-medium text-[#737373] hover:text-white transition-colors">Chords</a>
-                    <a href="/spectrum" class="text-sm font-medium text-[#737373] hover:text-white transition-colors">Spectrum</a>
+                    <a href="/home" class="text-sm font-medium nav-text transition-colors">Visualizer</a>
+                    <a href="/pitch" class="text-sm font-medium nav-text transition-colors">Pitch</a>
+                    <a href="/tuner" class="text-sm font-medium nav-text transition-colors">Tuner</a>
+                    <a href="/metronome" class="text-sm font-medium nav-text transition-colors">Metronome</a>
+                    <a href="/chords" class="text-sm font-medium nav-text transition-colors">Chords</a>
+                    <a href="/spectrum" class="text-sm font-medium nav-text transition-colors">Spectrum</a>
                 </div>
 
-                <div class="flex items-center border-l border-[#262626] ml-2 pl-6">
-                    <div class="logout-icon cursor-pointer text-[#737373] hover:text-red-400 transition-colors" id="logoutIcon">
+                <div class="flex items-center border-l ml-2 pl-6" style="border-color: var(--border-primary);">
+                    <div class="logout-icon cursor-pointer nav-text hover:text-red-400 transition-colors" id="logoutIcon">
                         <i class="fas fa-sign-out-alt text-lg"></i>
                     </div>
                 </div>
 
-                <button class="lg:hidden text-white" onclick="document.getElementById('mobile-nav').classList.toggle('hidden')">
+                <button class="lg:hidden nav-logo-text" onclick="document.getElementById('mobile-nav').classList.toggle('hidden')">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
             </div>
         </div>
 
         <div id="mobile-nav" class="hidden lg:hidden mt-4 space-y-4 pb-4 transition-all">
-            <a href="/home" class="block text-[#737373] hover:text-white">Visualizer</a>
-            <a href="/pitch" class="block text-[#737373] hover:text-white">Pitch</a>
-            <a href="/tuner" class="block text-[#737373] hover:text-white">Tuner</a>
-            <a href="/metronome" class="block text-[#737373] hover:text-white">Metronome</a>
-            <a href="/chords" class="block text-[#737373] hover:text-white">Chords</a>
-            <a href="/spectrum" class="block text-[#737373] hover:text-white">Spectrum</a>
+            <a href="/home" class="block nav-text">Visualizer</a>
+            <a href="/pitch" class="block nav-text">Pitch</a>
+            <a href="/tuner" class="block nav-text">Tuner</a>
+            <a href="/metronome" class="block nav-text">Metronome</a>
+            <a href="/chords" class="block nav-text">Chords</a>
+            <a href="/spectrum" class="block nav-text">Spectrum</a>
         </div>
     </nav>
 
@@ -186,8 +231,8 @@
 
             <div class="spectrum-header">
                 <div>
-                    <h1 class="font-['Montserrat'] font-bold text-2xl text-white">Spectrum Analyzer</h1>
-                    <p class="text-sm text-[#737373] font-['Inter']">Real-time frequency band analysis</p>
+                    <h1 class="font-['Montserrat'] font-bold text-2xl nav-logo-text">Spectrum Analyzer</h1>
+                    <p class="text-sm nav-text font-['Inter']">Real-time frequency band analysis</p>
                 </div>
                 
                 <div class="controls-wrapper">
@@ -303,6 +348,7 @@
         });
     </script>
 
+    <script type="module" src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/spectrum.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
