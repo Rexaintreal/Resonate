@@ -5,8 +5,8 @@
 }
 
 body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
+    background-color: #000000;
+    color: #FFFFFF;
     font-family: 'Inter', sans-serif;
     height: 100vh;
     display: flex;
@@ -24,7 +24,7 @@ body {
 
 .content h2 {
     font-family: "Poppins", sans-serif;
-    color: var(--text-primary);
+    color: #fff;
     font-size: 6em;
     position: absolute;
     transform: translate(-50%, -50%);
@@ -69,8 +69,8 @@ body {
 }
 
 .btn-pill-white {
-    background-color: var(--bg-tertiary);
-    color: var(--text-secondary);
+    background-color: #262626;
+    color: #F4F4F4;
     border-radius: 6px;
     padding: 10px 24px;
     font-weight: 600;
@@ -81,14 +81,14 @@ body {
 }
 
 .btn-pill-white:hover {
-    background-color: var(--border-secondary);
+    background-color: #333333;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px var(--shadow-sm);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .btn-pill-explore {
-    background-color: var(--text-primary);
-    color: var(--bg-primary);
+    background-color: #FFFFFF;
+    color: #000000;
     border-radius: 9999px;
     padding: 12px 32px;
     font-weight: 600;
@@ -100,9 +100,9 @@ body {
 }
 
 .btn-pill-explore:hover {
-    opacity: 0.9;
+    background-color: #e2e2e2;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px var(--shadow-sm);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .waves {

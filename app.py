@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 import uuid
 from datetime import datetime
+import traceback
+import json
 
 load_dotenv()
 
@@ -12,7 +14,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-here')
 
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
-ALLOWED_EXTENSIONS = {'webm', 'wav', 'mp3', 'ogg', 'm4a', 'aac', 'flac', 'opus'} #more file support
+ALLOWED_EXTENSIONS = {'webm', 'wav', 'mp3', 'ogg', 'm4a', 'aac', 'flac', 'opus'}
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -108,6 +110,8 @@ def login():
         
         return jsonify({'success': True})
     except Exception as e:
+        print(f"Login error: {str(e)}")
+        traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/logout', methods=['POST'])
@@ -116,6 +120,7 @@ def logout():
         session.pop('user', None)
         return jsonify({'success': True})
     except Exception as e:
+        print(f"Logout error: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/check-auth')
@@ -156,6 +161,51 @@ def upload_recording():
             'url': url_for('static', filename=f'uploads/{filename}')
         })
     except Exception as e:
+        print(f"Upload error: {str(e)}")
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/rename-recording', methods=['POST'])
+@login_required
+def rename_recording():
+    try:
+        data = request.get_json()
+        filename = data.get('filename')
+        new_name = data.get('newName', '').strip()
+        
+        print(f"Rename request - filename: {filename}, new_name: {new_name}") #debug
+        
+        if not filename or not new_name:
+            return jsonify({'success': False, 'error': 'Filename and new name are required'}), 400
+        
+        user_id = session['user']['uid']
+        
+        if not filename.startswith(user_id):
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+        if len(new_name) > 100:
+            return jsonify({'success': False, 'error': 'Name too long (max 100 characters)'}), 400
+        metadata_path = os.path.join(app.config['UPLOAD_FOLDER'], 'metadata.json')
+        metadata = {}
+        
+        if os.path.exists(metadata_path):
+            try:
+                with open(metadata_path, 'r') as f:
+                    metadata = json.load(f)
+            except:
+                metadata = {}
+        metadata[filename] = {
+            'customName': new_name,
+            'updatedAt': datetime.now().isoformat()
+        }
+        with open(metadata_path, 'w') as f:
+            json.dump(metadata, f, indent=2)
+        
+        print(f"Successfully renamed {filename} to {new_name}")
+        return jsonify({'success': True, 'newName': new_name})
+        
+    except Exception as e:
+        print(f"Rename error: {str(e)}")
+        traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/delete-recording', methods=['POST'])
@@ -165,21 +215,58 @@ def delete_recording():
         data = request.get_json()
         filename = data.get('filename')
         
+        print(f"Delete request for filename: {filename}")
+        
         if not filename:
             return jsonify({'success': False, 'error': 'No filename provided'}), 400
         
         user_id = session['user']['uid']
+        print(f"User ID: {user_id}")
+        
         if not filename.startswith(user_id):
+            print(f"Unauthorized: filename doesn't start with user_id")
             return jsonify({'success': False, 'error': 'Unauthorized'}), 403
         
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename))
+        if '..' in filename or '/' in filename or '\\' in filename:
+            return jsonify({'success': False, 'error': 'Invalid filename'}), 400
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        print(f"Attempting to delete: {filepath}")
+        print(f"File exists: {os.path.exists(filepath)}")
         
         if os.path.exists(filepath):
-            os.remove(filepath)
-            return jsonify({'success': True})
+            try:
+                os.remove(filepath)
+                print(f"Successfully deleted: {filepath}")
+                metadata_path = os.path.join(app.config['UPLOAD_FOLDER'], 'metadata.json')
+                if os.path.exists(metadata_path):
+                    try:
+                        with open(metadata_path, 'r') as f:
+                            metadata = json.load(f)
+                        if filename in metadata:
+                            del metadata[filename]
+                            with open(metadata_path, 'w') as f:
+                                json.dump(metadata, f, indent=2)
+                    except:
+                        pass
+                
+                return jsonify({'success': True})
+            except PermissionError as e:
+                print(f"Permission error: {str(e)}")
+                return jsonify({'success': False, 'error': 'Permission denied'}), 403
+            except Exception as e:
+                print(f"Error deleting file: {str(e)}")
+                traceback.print_exc()
+                return jsonify({'success': False, 'error': f'Error deleting file: {str(e)}'}), 500
         else:
+            print(f"File not found: {filepath}")
+            files = os.listdir(app.config['UPLOAD_FOLDER'])
+            print(f"Files in upload folder: {files}")
             return jsonify({'success': False, 'error': 'File not found'}), 404
+            
     except Exception as e:
+        print(f"Delete recording error: {str(e)}") #debug
+        traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/get-recordings')
@@ -189,11 +276,25 @@ def get_recordings():
         user_id = session['user']['uid']
         recordings = []
         
+        metadata_path = os.path.join(app.config['UPLOAD_FOLDER'], 'metadata.json')
+        metadata = {}
+        
+        if os.path.exists(metadata_path):
+            try:
+                with open(metadata_path, 'r') as f:
+                    metadata = json.load(f)
+            except:
+                metadata = {}
+        
         for filename in os.listdir(app.config['UPLOAD_FOLDER']):
             if filename.startswith(user_id) and any(filename.endswith(f'.{ext}') for ext in ALLOWED_EXTENSIONS):
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            
+                custom_name = metadata.get(filename, {}).get('customName')
+                
                 recordings.append({
                     'filename': filename,
+                    'customName': custom_name,
                     'url': url_for('static', filename=f'uploads/{filename}'),
                     'timestamp': os.path.getctime(filepath)
                 })
@@ -202,6 +303,8 @@ def get_recordings():
         
         return jsonify({'success': True, 'recordings': recordings})
     except Exception as e:
+        print(f"Get recordings error: {str(e)}") # remove later debug statement
+        traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':

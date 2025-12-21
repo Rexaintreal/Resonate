@@ -54,10 +54,15 @@ const uploadError = document.getElementById('uploadError');
 const uploadErrorMessage = document.getElementById('uploadErrorMessage');
 const closeUploadError = document.getElementById('closeUploadError');
 const fileUploadInput = document.getElementById('fileUploadInput');
+const renameModal = document.getElementById('renameModal');
+const cancelRename = document.getElementById('cancelRename');
+const confirmRename = document.getElementById('confirmRename');
+const renameInput = document.getElementById('renameInput');
 
 let pendingDeleteFilename = null;
 let pendingDownloadUrl = null;
 let pendingDownloadFilename = null;
+let pendingRenameFilename = null;
 
 function resetUploadModal() {
     uploadFileName.textContent = 'Preparing upload...';
@@ -102,7 +107,6 @@ uploadModal?.addEventListener('click', (e) => {
 fileUploadInput?.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
 
     if (!file.type.startsWith('audio/')) {
         window.toast.error('Invalid file', 'Please select an audio file');
@@ -246,6 +250,65 @@ deleteModal.addEventListener('click', (e) => {
         pendingDeleteFilename = null;
     }
 });
+cancelRename?.addEventListener('click', () => {
+    renameModal.classList.add('hidden');
+    renameModal.classList.remove('flex');
+    renameInput.value = '';
+    pendingRenameFilename = null;
+});
+
+confirmRename?.addEventListener('click', async () => {
+    const newName = renameInput.value.trim();
+    
+    if (!newName) {
+        window.toast.warning('Name required', 'Please enter a name');
+        return;
+    }
+    
+    if (pendingRenameFilename) {
+        try {
+            const response = await fetch('/api/rename-recording', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    filename: pendingRenameFilename,
+                    newName: newName
+                })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                await loadRecordings();
+                window.toast.success('Recording renamed', `Now called "${newName}"`);
+            } else {
+                window.toast.error('Rename failed', data.error || 'Could not rename recording');
+            }
+        } catch (error) {
+            console.error('Error renaming recording:', error);
+            window.toast.error('Rename failed', 'An error occurred');
+        }
+    }
+    
+    renameModal.classList.add('hidden');
+    renameModal.classList.remove('flex');
+    renameInput.value = '';
+    pendingRenameFilename = null;
+});
+
+renameModal?.addEventListener('click', (e) => {
+    if (e.target === renameModal) {
+        renameModal.classList.add('hidden');
+        renameModal.classList.remove('flex');
+        renameInput.value = '';
+        pendingRenameFilename = null;
+    }
+});
+
+renameInput?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        confirmRename.click();
+    }
+});
 
 cancelFormat.addEventListener('click', () => {
     formatModal.classList.add('hidden');
@@ -373,16 +436,20 @@ function updateRecordingsList(recordings) {
         const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const dateStr = date.toLocaleDateString();
         const recNumber = recordings.length - index;
+        const displayName = rec.customName || `Recording ${recNumber}`;
         
         return `
             <div class="recording-item" data-filename="${rec.filename}">
                 <div class="recording-info">
-                    <div class="recording-name">Recording ${recNumber}</div>
+                    <div class="recording-name">${displayName}</div>
                     <div class="recording-meta">${dateStr} • ${timeStr}</div>
                 </div>
                 <div class="recording-actions">
                     <button class="action-btn play-btn" data-url="${rec.url}" title="Play">
                         <i class="fas fa-play"></i>
+                    </button>
+                    <button class="action-btn rename-btn" data-filename="${rec.filename}" data-current-name="${displayName}" title="Rename">
+                        <i class="fas fa-edit"></i>
                     </button>
                     <button class="action-btn download-btn" data-url="${rec.url}" data-filename="${rec.filename}" title="Download">
                         <i class="fas fa-download"></i>
@@ -478,6 +545,24 @@ function updateRecordingsList(recordings) {
                 window.toast.error('Playback failed', 'Could not play recording');
                 infoBox.innerHTML = '<p class="text-red-400">Failed to play recording</p>';
             }
+        });
+    });
+    document.querySelectorAll('.rename-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            pendingRenameFilename = btn.dataset.filename;
+            const currentName = btn.dataset.currentName;
+            if (!currentName.startsWith('Recording ')) {
+                renameInput.value = currentName;
+            } else {
+                renameInput.value = '';
+            }
+            
+            renameModal.classList.remove('hidden');
+            renameModal.classList.add('flex');
+            setTimeout(() => {
+                renameInput.focus();
+                renameInput.select();
+            }, 100);
         });
     });
 

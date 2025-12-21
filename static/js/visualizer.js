@@ -18,8 +18,9 @@ export class Visualizer {
         this.setupCanvas();
     }
 
-    getThemeColor(property) {
-        return getComputedStyle(document.documentElement).getPropertyValue(property).trim();
+    getThemeColor(property, fallback = '#14B8A6') {
+        const color = getComputedStyle(document.documentElement).getPropertyValue(property).trim();
+        return color || fallback;
     }
 
     setupCanvas() {
@@ -198,8 +199,7 @@ export class Visualizer {
         const bars = this.getLogFrequencyData(barCount);
         const barWidth = width / bars.length;
         
-        // Create gradient using theme colors
-        const accentColor = this.getThemeColor('--color-accent');
+        const accentColor = this.getThemeColor('--accent-teal', '#14B8A6');
         const gradient = this.ctx.createLinearGradient(0, height, 0, 0);
         gradient.addColorStop(0, accentColor);
         gradient.addColorStop(0.5, accentColor + 'dd');
@@ -221,7 +221,7 @@ export class Visualizer {
 
     drawWaveform(width, height) {
         const waveform = this.fftProcessor.getWaveform(512);
-        const accentColor = this.getThemeColor('--color-accent');
+        const accentColor = this.getThemeColor('--accent-teal', '#14B8A6');
         
         this.ctx.beginPath();
         this.ctx.strokeStyle = accentColor;
@@ -253,8 +253,8 @@ export class Visualizer {
         const centerY = height / 2;
         const maxRadius = Math.min(width, height) * 0.42;
         const minRadius = maxRadius * 0.25;
-        const borderColor = this.getThemeColor('--border-primary');
-        const accentColor = this.getThemeColor('--color-accent');
+        const borderColor = this.getThemeColor('--border-primary', '#262626');
+        const accentColor = this.getThemeColor('--accent-teal', '#14B8A6');
 
         this.ctx.strokeStyle = borderColor;
         this.ctx.lineWidth = 1;
@@ -295,7 +295,7 @@ export class Visualizer {
         const barCount = window.settingsManager ? 
             Math.floor(window.settingsManager.getSettings().barCount * 1.25) : 80;
         const bars = this.getLogFrequencyData(barCount);
-        const accentColor = this.getThemeColor('--color-accent');
+        const accentColor = this.getThemeColor('--accent-teal', '#14B8A6');
         
         this.ctx.beginPath();
         this.ctx.strokeStyle = accentColor;
