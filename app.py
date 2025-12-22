@@ -88,6 +88,10 @@ def spectrum():
 def metronome():
     return render_template('metronome.html')
 
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html')
 
 @app.route('/api/login', methods=['POST'])
 def login():
