@@ -164,7 +164,7 @@ export class ChordDetector {
     }
 
     getChordSymbol(chord) {
-        if (!chord) return '--';
+        if (!chord || confidence < 0.3) return '--';
         
         const symbols = {
             'Major': '',

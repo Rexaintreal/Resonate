@@ -45,7 +45,7 @@ export class PracticeTracker {
         if(!this.currentSession) {
             return null;
         }
-
+        clearInterval(this.updateInterval);
         if  (this.updateInterval) {
             clearInterval(this.updateInterval);
             this.updateInterval = null;
@@ -136,7 +136,7 @@ export class PracticeTracker {
     }
 
     formatDuration(seconds) {
-        const mine = Math.floor(seconds / 60);
+        const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     }

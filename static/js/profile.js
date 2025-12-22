@@ -595,9 +595,8 @@ function updateRecordingsList(recordings) {
     });
 }
 
-setTimeout(() => {
+document.addEventListener('DOMContentLoaded', () => {
     loadUserProfile();
     updatePracticeDisplay();
     loadRecordings();
-}, 100);
-
+});

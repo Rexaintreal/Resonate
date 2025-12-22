@@ -116,7 +116,10 @@ export class Visualizer {
 
 
     animate() {
-        if (!this.isRunning) return;
+        if (!this.isRunning || document.hidden) {
+            this.animationId = requestAnimationFrame(() => this.animate());
+            return;
+        }
         // throttle to 30 fps for low end devices
         const now = performance.now();
         if (this.lastFrameTime && now - this.lastFrameTime < 33) {

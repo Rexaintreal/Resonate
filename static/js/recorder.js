@@ -35,9 +35,10 @@ export class AudioRecorder {
         this.audioChunks = [];
         
         try {
-            this.mediaRecorder = new MediaRecorder(this.stream, {
-                mimeType: 'audio/webm;codecs=opus'
-            });
+            const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
+                            ? 'audio/webm;codecs=opus' 
+                            : 'audio/webm';
+            this.mediaRecorder = new MediaRecorder(this.stream, { mimeType });
         } catch(e) {
             console.error('MediaRecorder error:', e);
             return false;

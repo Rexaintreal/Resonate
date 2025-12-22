@@ -158,7 +158,7 @@ def login():
 @app.route('/api/logout', methods=['POST'])
 def logout():
     try:
-        session.pop('user', None)
+        session.clear()
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Logout error: {str(e)}")
@@ -192,6 +192,7 @@ def upload_recording():
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         unique_id = str(uuid.uuid4())[:8]
         filename = f"{user_id}_{timestamp}_{unique_id}.{original_extension}"
+        filename = secure_filename(filename) 
         
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)

@@ -21,6 +21,9 @@ export class AudioCapture {
             });
 
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            if (this.audioContext.state === 'suspended') {
+                await this.audioContext.resume();
+            }
             this.analyser = this.audioContext.createAnalyser();
             this.analyser.fftSize = 2048;  //DEFAULT (change in settings)
             this.analyser.smoothingTimeConstant = 0.8; //smothing
