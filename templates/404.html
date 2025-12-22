@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Not Found</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Inter:wght@400&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: var(--bg-primary); color: var(--text-primary); }
+    </style>
+ </head>
+ <body class="h-screen flex items-center justify-center p-6">
+    <div class="text-center">
+        <h1 class="text-6xl font-['Montserrat'] font-bold mb-2" style="color: var(--accent-teal);">404</h1>
+        <p class="text-lg font-['Inter'] mb-8" style="color: var(--text-secondary);">The page you're trying to access does not exist.</p>
+        
+        <a href="/home" class="px-6 py-2 rounded-md font-medium transition-all hover:opacity-80 text-white" style="background-color: var(--accent-teal);">
+            Back to Home
+        </a>
+    </div>
+    <script type="module" src="{{ url_for('static', filename='js/theme.js') }}"></script>
+ </body>
+</html>
