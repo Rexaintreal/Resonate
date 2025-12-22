@@ -1,10 +1,10 @@
 .profile-layout {
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 32px;
-    min-height: calc(100vh - 150px);
+    gap: 20px;
+    height: 100%;
 }
 
 .profile-header {
@@ -12,35 +12,55 @@
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
-    padding-bottom: 8px;
 }
 
 .profile-content {
     display: grid;
-    grid-template-columns: 380px 1fr;
-    gap: 24px;
-    min-height: 280px;
+    grid-template-columns: 320px 1fr 420px;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.profile-left-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+}
+
+.profile-left-section::-webkit-scrollbar {
+    width: 6px;
+}
+
+.profile-left-section::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.profile-left-section::-webkit-scrollbar-thumb {
+    background: var(--border-primary);
+    border-radius: 3px;
 }
 
 .profile-info-card {
     background: var(--bg-secondary);
     border: 1px solid var(--border-primary);
     border-radius: 16px;
-    padding: 40px 32px;
+    padding: 24px 20px;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: fit-content;
 }
 
 .profile-avatar-container {
-    width: 140px;
-    height: 140px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     overflow: hidden;
-    border: 4px solid var(--border-primary);
-    margin-bottom: 24px;
+    border: 3px solid var(--border-primary);
+    margin-bottom: 16px;
 }
 
 .profile-avatar {
@@ -50,24 +70,42 @@
 }
 
 .profile-name {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 700;
     font-family: 'Montserrat', sans-serif;
     color: var(--text-primary);
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .profile-email {
-    font-size: 14px;
+    font-size: 12px;
     color: var(--text-muted);
     font-family: 'Inter', sans-serif;
     word-break: break-word;
+    margin-bottom: 16px;
 }
 
-.profile-stats-section {
+.delete-account-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border-primary);
+    color: var(--text-muted);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
     display: flex;
-    flex-direction: column;
-    gap: 24px;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-account-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--accent-red);
+    color: var(--accent-red);
 }
 
 .practice-stats-card,
@@ -75,31 +113,31 @@
     background: var(--bg-secondary);
     border: 1px solid var(--border-primary);
     border-radius: 16px;
-    padding: 32px;
+    padding: 20px;
 }
 
 .section-title {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 700;
     font-family: 'Montserrat', sans-serif;
     color: var(--text-primary);
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .practice-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .practice-stat {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .practice-label {
-    font-size: 13px;
+    font-size: 11px;
     color: var(--text-muted);
     font-family: 'Inter', sans-serif;
     text-transform: uppercase;
@@ -107,7 +145,7 @@
 }
 
 .practice-value {
-    font-size: 36px;
+    font-size: 28px;
     font-weight: 700;
     font-family: 'Montserrat', sans-serif;
     color: var(--accent-teal);
@@ -115,24 +153,23 @@
 }
 
 .account-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .account-stat {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    text-align: center;
-    padding: 20px;
+    gap: 8px;
+    padding: 14px;
     background: var(--bg-tertiary);
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid var(--border-tertiary);
 }
 
 .account-label {
-    font-size: 12px;
+    font-size: 10px;
     color: var(--text-muted);
     font-family: 'Inter', sans-serif;
     text-transform: uppercase;
@@ -140,11 +177,151 @@
 }
 
 .account-value {
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 700;
     font-family: 'Montserrat', sans-serif;
     color: var(--text-secondary);
     line-height: 1;
+}
+
+.profile-middle-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+}
+
+.profile-middle-section::-webkit-scrollbar {
+    width: 6px;
+}
+
+.profile-middle-section::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.profile-middle-section::-webkit-scrollbar-thumb {
+    background: var(--border-primary);
+    border-radius: 3px;
+}
+
+.stats-overview-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.stats-grid-large {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.large-stat-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.large-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(20, 184, 166, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.large-stat-icon i {
+    font-size: 24px;
+    color: var(--accent-teal);
+}
+
+.large-stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.large-stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.activity-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 16px;
+    padding: 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.activity-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 10px;
+}
+
+.activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(20, 184, 166, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.activity-icon i {
+    font-size: 16px;
+    color: var(--accent-teal);
+}
+
+.activity-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 2px;
+}
+
+.activity-time {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
 }
 
 .recordings-section {
@@ -157,32 +334,34 @@
 }
 
 .recordings-header {
-    padding: 24px 28px;
+    padding: 20px 20px 16px 20px;
     border-bottom: 1px solid var(--border-primary);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--bg-secondary);
     flex-shrink: 0;
+}
+
+.recordings-header h3 {
+    margin-bottom: 4px;
 }
 
 .sort-controls {
     display: flex;
     gap: 8px;
+    margin-top: 12px;
 }
 
 .sort-btn {
     background: var(--bg-tertiary);
     border: 1px solid var(--border-primary);
     color: var(--text-muted);
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 600;
     font-family: 'Inter', sans-serif;
     transition: all 0.2s;
     white-space: nowrap;
+    flex: 1;
 }
 
 .sort-btn:hover {
@@ -199,26 +378,21 @@
 .recordings-list {
     flex: 1;
     overflow-y: auto;
-    padding: 16px;
-    min-height: 400px;
-    max-height: 600px;
+    padding: 12px;
+    min-height: 0;
 }
 
 .recordings-list::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 .recordings-list::-webkit-scrollbar-track {
-    background: var(--bg-tertiary);
+    background: transparent;
 }
 
 .recordings-list::-webkit-scrollbar-thumb {
     background: var(--border-primary);
-    border-radius: 4px;
-}
-
-.recordings-list::-webkit-scrollbar-thumb:hover {
-    background: var(--border-secondary);
+    border-radius: 3px;
 }
 
 .empty-state {
@@ -226,17 +400,18 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 80px 20px;
+    padding: 60px 20px;
     text-align: center;
     color: var(--text-disabled);
+    height: 100%;
 }
 
 .recording-item {
     background: var(--bg-tertiary);
     border: 1px solid var(--border-primary);
-    border-radius: 12px;
-    padding: 16px 18px;
-    margin-bottom: 12px;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -245,42 +420,41 @@
 
 .recording-item:hover {
     border-color: var(--border-secondary);
-    transform: translateX(4px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateX(2px);
 }
 
 .recording-info {
     flex: 1;
     min-width: 0;
-    padding-right: 16px;
+    padding-right: 12px;
 }
 
 .recording-name {
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-family: 'Inter', sans-serif;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 .recording-meta {
-    font-size: 12px;
+    font-size: 10px;
     color: var(--text-muted);
     font-family: 'Inter', sans-serif;
 }
 
 .recording-actions {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     flex-shrink: 0;
 }
 
 .action-btn {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 8px;
     background: var(--border-primary);
     border: 1px solid transparent;
@@ -288,7 +462,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    font-size: 12px;
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -296,7 +470,7 @@
 .action-btn:hover {
     color: var(--text-secondary);
     background: var(--border-secondary);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 .rename-btn:hover {
@@ -314,107 +488,146 @@
     border-color: var(--accent-red);
 }
 
+@media (max-width: 1400px) {
+    .profile-content {
+        grid-template-columns: 280px 1fr 380px;
+    }
+}
+
 @media (max-width: 1200px) {
     .profile-content {
-        grid-template-columns: 320px 1fr;
+        grid-template-columns: 260px 1fr 340px;
     }
     
-    .account-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+    .stats-grid-large {
+        grid-template-columns: 1fr;
+        gap: 12px;
     }
 }
 
 @media (max-width: 1024px) {
     .profile-content {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 400px;
+        gap: 16px;
     }
     
-    .profile-info-card {
-        padding: 32px 24px;
-    }
-
-    .account-grid {
-        grid-template-columns: repeat(3, 1fr);
+    .profile-left-section {
+        grid-row: 2;
     }
     
-    .practice-grid {
+    .profile-middle-section {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+    
+    .recordings-section {
+        grid-row: 2;
+    }
+    
+    .stats-grid-large {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 768px) {
-    .profile-layout {
-        gap: 24px;
-        padding: 0;
+    .profile-content {
+        grid-template-columns: 1fr;
+        gap: 16px;
     }
     
-    .practice-stats-card,
-    .account-stats-card {
-        padding: 24px;
+    .profile-left-section,
+    .profile-middle-section,
+    .recordings-section {
+        grid-column: 1;
+        max-height: none;
     }
-
+    
+    .profile-middle-section {
+        order: 1;
+    }
+    
+    .profile-left-section {
+        order: 2;
+    }
+    
+    .recordings-section {
+        order: 3;
+        max-height: 400px;
+    }
+    
+    .stats-grid-large {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
     .practice-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-
-    .account-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-    
-    .account-stat {
-        padding: 16px;
-    }
-
-    .sort-controls {
         flex-direction: row;
-        gap: 6px;
-    }
-
-    .sort-btn {
-        flex: 1;
-        font-size: 12px;
-        padding: 6px 12px;
-    }
-
-    .recordings-header {
-        flex-direction: column;
-        gap: 16px;
-        align-items: flex-start;
     }
     
-    .recordings-list {
-        max-height: 500px;
-        min-height: 300px;
+    .account-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 @media (max-width: 640px) {
-    .profile-avatar-container {
-        width: 110px;
-        height: 110px;
+    main {
+        padding: 16px 12px !important;
     }
     
-    .profile-name {
+    .profile-layout {
+        gap: 12px;
+    }
+    
+    .profile-header h1 {
         font-size: 20px;
     }
     
-    .practice-value {
+    .profile-header p {
+        font-size: 12px;
+    }
+    
+    .stats-grid-large {
+        grid-template-columns: 1fr;
+    }
+    
+    .large-stat-card {
+        padding: 16px;
+    }
+    
+    .large-stat-value {
         font-size: 28px;
     }
     
-    .account-value {
+    .practice-grid {
+        flex-direction: column;
+    }
+    
+    .practice-value {
         font-size: 24px;
     }
     
+    .account-grid {
+        grid-template-columns: 1fr;
+    }
+    
     .recordings-list {
-        padding: 12px;
+        padding: 8px;
     }
     
     .recording-item {
-        padding: 14px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .recording-info {
+        width: 100%;
+        padding-right: 0;
+    }
+    
+    .recording-actions {
+        width: 100%;
+        justify-content: flex-end;
     }
 }
 

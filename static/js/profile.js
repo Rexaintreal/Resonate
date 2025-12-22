@@ -1,4 +1,4 @@
-import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getAuth, signOut, onAuthStateChanged, deleteUser, GoogleAuthProvider, signInWithPopup, reauthenticateWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { AudioConverter } from './converter.js';
 import { PracticeTracker } from './practice_tracker.js';
 
@@ -6,6 +6,7 @@ const converter = new AudioConverter();
 const practiceTracker = new PracticeTracker();
 
 let firebaseInitialized = false;
+let currentUser = null;
 
 const logoutIcon = document.getElementById('logoutIcon');
 const logoutModal = document.getElementById('logoutModal');
@@ -34,6 +35,10 @@ const recordingsList = document.getElementById('recordingsList');
 const emptyState = document.getElementById('emptyState');
 const sortNewest = document.getElementById('sortNewest');
 const sortOldest = document.getElementById('sortOldest');
+const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+const deleteAccountModal = document.getElementById('deleteAccountModal');
+const cancelDeleteAccount = document.getElementById('cancelDeleteAccount');
+const confirmDeleteAccount = document.getElementById('confirmDeleteAccount');
 
 let pendingDeleteFilename = null;
 let pendingDownloadUrl = null;
@@ -260,6 +265,68 @@ sortOldest.addEventListener('click', () => {
     sortNewest.classList.remove('active');
     sortAndDisplayRecordings();
 });
+deleteAccountBtn?.addEventListener('click', () => {
+    deleteAccountModal.classList.remove('hidden');
+    deleteAccountModal.classList.add('flex');
+});
+
+cancelDeleteAccount?.addEventListener('click', () => {
+    deleteAccountModal.classList.add('hidden');
+    deleteAccountModal.classList.remove('flex');
+});
+
+confirmDeleteAccount?.addEventListener('click', async () => {
+    try {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        
+        if (!user) {
+            window.toast.error('Error', 'No user logged in');
+            return;
+        }
+        deleteAccountModal.classList.add('hidden');
+        deleteAccountModal.classList.remove('flex');
+        window.toast.info('Security check', 'Please sign in again to confirm');
+        
+        try {
+            const provider = new GoogleAuthProvider();
+            await reauthenticateWithPopup(user, provider);
+            window.toast.info('Deleting account', 'Please wait...');
+            await deleteAllUserRecordings();
+            practiceTracker.clearAllData();
+            localStorage.clear();
+            await deleteUser(user);
+            await fetch('/api/logout', { method: 'POST' });
+            window.toast.success('Account deleted', 'Your account has been permanently deleted');
+            
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1500);
+            
+        } catch (reauthError) {
+            console.error('Re-authentication error:', reauthError);
+            
+            if (reauthError.code === 'auth/popup-closed-by-user') {
+                window.toast.warning('Cancelled', 'Account deletion cancelled');
+            } else if (reauthError.code === 'auth/popup-blocked') {
+                window.toast.error('Popup blocked', 'Please allow popups and try again');
+            } else {
+                window.toast.error('Authentication failed', 'Could not verify your identity');
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error deleting account:', error);
+        window.toast.error('Delete failed', error.message || 'Could not delete account');
+    }
+});
+
+deleteAccountModal?.addEventListener('click', (e) => {
+    if (e.target === deleteAccountModal) {
+        deleteAccountModal.classList.add('hidden');
+        deleteAccountModal.classList.remove('flex');
+    }
+});
 
 async function loadUserProfile() {
     try {
@@ -267,6 +334,7 @@ async function loadUserProfile() {
         
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                currentUser = user;
                 profileAvatar.src = user.photoURL || 'https://via.placeholder.com/120';
                 profileName.textContent = user.displayName || 'User';
                 profileEmail.textContent = user.email || '';
@@ -294,7 +362,65 @@ function updatePracticeDisplay() {
     todayPractice.textContent = practiceTracker.formatMinutes(todayStats.minutes);
     weekPractice.textContent = practiceTracker.formatMinutes(weekStats.minutes);
     
-    totalSessions.textContent = practiceTracker.sessions.length;
+    const sessionsCount = practiceTracker.sessions.length;
+    totalSessions.textContent = sessionsCount;
+    const totalSessionsLarge = document.getElementById('totalSessionsLarge');
+    if (totalSessionsLarge) {
+        totalSessionsLarge.textContent = sessionsCount;
+    }
+    
+    updateActivityFeed();
+}
+
+function updateActivityFeed() {
+    const activityItems = document.getElementById('activityItems');
+    if (!activityItems) return;
+    
+    const recentSessions = practiceTracker.sessions.slice(-5).reverse();
+    
+    if (recentSessions.length === 0) {
+        activityItems.innerHTML = `
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="activity-details">
+                    <div class="activity-title">No recent activity</div>
+                    <div class="activity-time">Start practicing to see activity</div>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    activityItems.innerHTML = recentSessions.map(session => {
+        const date = new Date(session.date);
+        const timeAgo = getTimeAgo(date);
+        const duration = practiceTracker.formatMinutes(session.minutes);
+        
+        return `
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-music"></i>
+                </div>
+                <div class="activity-details">
+                    <div class="activity-title">Practice session • ${duration}</div>
+                    <div class="activity-time">${timeAgo}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function getTimeAgo(date) {
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+    return date.toLocaleDateString();
 }
 
 async function loadRecordings() {
@@ -306,6 +432,10 @@ async function loadRecordings() {
             allRecordings = data.recordings;
             sortAndDisplayRecordings();
             totalFiles.textContent = data.recordings.length;
+            const totalFilesLarge = document.getElementById('totalFilesLarge');
+            if (totalFilesLarge) {
+                totalFilesLarge.textContent = data.recordings.length;
+            }
         }
     } catch (error) {
         console.error('Error loading recordings:', error);
@@ -322,6 +452,22 @@ function sortAndDisplayRecordings() {
     }
     
     updateRecordingsList(sortedRecordings);
+}
+
+async function deleteAllUserRecordings() {
+    if (!allRecordings || allRecordings.length === 0) {
+        return;
+    }
+    
+    const deletePromises = allRecordings.map(recording => 
+        fetch('/api/delete-recording', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: recording.filename })
+        })
+    );
+    
+    await Promise.all(deletePromises);
 }
 
 function updateRecordingsList(recordings) {
