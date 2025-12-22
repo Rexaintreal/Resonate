@@ -25,7 +25,7 @@ Resonate is a web app built using HTML, Tailwind CSS, Javascript and Flask for [
 ## Live Demo
 
 - Resonate is Live at [resonate.pythonanywhere.com](https://resonate.pythonanywhere.com) 
-- Demo Video: [Watch on Google Drive](https://drive.google.com/)
+- Demo Video: [Watch on Google Drive](https://drive.google.com/file/d/1_nz1CTKchTDw61j7YDfQJTf0-6rgIKfM/view?usp=sharing)
 
 ---
 
