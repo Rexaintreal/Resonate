@@ -39,6 +39,7 @@ const deleteAccountBtn = document.getElementById('deleteAccountBtn');
 const deleteAccountModal = document.getElementById('deleteAccountModal');
 const cancelDeleteAccount = document.getElementById('cancelDeleteAccount');
 const confirmDeleteAccount = document.getElementById('confirmDeleteAccount');
+const exportDataBtn = document.getElementById('exportDataBtn');
 
 let pendingDeleteFilename = null;
 let pendingDownloadUrl = null;
@@ -46,6 +47,57 @@ let pendingDownloadFilename = null;
 let pendingRenameFilename = null;
 let allRecordings = [];
 let currentSortOrder = 'newest';
+
+exportDataBtn?.addEventListener('click', async () => {
+    try {
+        window.toast.info('Exporting data', 'Preparing your data...');
+        
+        const exportData = {
+            exportDate: new Date().toISOString(),
+            profile: {
+                name: currentUser?.displayName || 'Unknown',
+                email: currentUser?.email || 'Unknown',
+                uid: currentUser?.uid || 'Unknown',
+                memberSince: currentUser?.metadata?.creationTime || 'Unknown'
+            },
+            practiceData: {
+                sessions: practiceTracker.sessions || [],
+                todayStats: practiceTracker.getTodayStats(),
+                weekStats: practiceTracker.getWeekStats(),
+                totalSessions: practiceTracker.sessions?.length || 0
+            },
+            recordings: allRecordings.map(rec => ({
+                filename: rec.filename,
+                customName: rec.customName,
+                timestamp: rec.timestamp,
+                date: new Date(rec.timestamp * 1000).toISOString()
+            })),
+            statistics: {
+                totalRecordings: allRecordings.length,
+                totalPracticeSessions: practiceTracker.sessions?.length || 0,
+                totalPracticeMinutes: practiceTracker.sessions?.reduce((sum, s) => sum + (s.minutes || 0), 0) || 0
+            }
+        };
+
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        const timestamp = new Date().toISOString().split('T')[0];
+        a.download = `resonate-data-${timestamp}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        window.toast.success('Export complete', 'Your data has been downloaded');
+    } catch (error) {
+        console.error('Export error:', error);
+        window.toast.error('Export failed', 'Could not export your data');
+    }
+});
 
 logoutIcon.addEventListener('click', (e) => {
     e.preventDefault();

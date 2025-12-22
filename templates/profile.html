@@ -65,6 +65,30 @@
         .nav-logo-text {
             color: var(--text-primary) !important;
         }
+
+        .export-data-btn {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--border-primary);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .export-data-btn:hover {
+            background: rgba(20, 184, 166, 0.1);
+            border-color: var(--accent-teal);
+            color: var(--accent-teal);
+        }
     </style>
  </head>
  <body>
@@ -211,7 +235,7 @@
             <a href="/profile" class="block nav-text">Profile</a>
         </div>
     </nav>
-    <main class="flex-1 px-6 py-6" style="height: calc(100vh - 73px); overflow: hidden;">
+    <main class="flex-1 min-h-0 overflow-hidden relative p-4">
         <div class="profile-layout">
             <div id="profileSkeleton" class="skeleton-container">
                 <div style="display: flex; flex-direction: column; gap: 24px; height: 100%;">
@@ -258,7 +282,6 @@
                 </div>
             </div>
             <div class="profile-content">
-                <!-- LEFT COLUMN -->
                 <div class="profile-left-section">
                     <div class="profile-info-card">
                         <div class="profile-avatar-container">
@@ -266,6 +289,10 @@
                         </div>
                         <h2 id="profileName" class="profile-name">Loading...</h2>
                         <p id="profileEmail" class="profile-email">Loading...</p>
+                        <button id="exportDataBtn" class="export-data-btn">
+                            <i class="fas fa-file-export mr-2"></i>
+                            Export Data as JSON
+                        </button>
                         <button id="deleteAccountBtn" class="delete-account-btn">
                             <i class="fas fa-trash mr-2"></i>
                             Delete Account
@@ -327,7 +354,7 @@
                         <div class="activity-items" id="activityItems">
                             <div class="activity-item">
                                 <div class="activity-icon">
-                                    <i class="fas fa-check"></i>
+                                 <i class="fas fa-info-circle"></i>
                                 </div>
                                 <div class="activity-details">
                                     <div class="activity-title">No recent activity</div>
